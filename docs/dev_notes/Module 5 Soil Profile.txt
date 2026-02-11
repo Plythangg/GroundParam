@@ -1,0 +1,128 @@
+Module 5: Separated - Soil Profile #propose to customize a single BH for report from Module 3's data
+
+Top bar
+
+> Export function → Save as PNG/PDF
+> Single boreholes → User Customization
+> Multiple boreholes → Side-by-side comparison #Data from Module 3 only
+
+Left Side > Table
+
+Soil Profile [-2.00] m. # Water-Level-input #Soil Types selected have only data from Module 3's data as available.
+
+#header 	|  Layer  |  From(m) | To(m) |       Soil Type       | N-value |    Description     |
+#exam		|    1    |  100.00  | 99.00 | Medium Dense Sand, SM |   20    |    #user-input     |
+#exam		|    2    |   99.00  | 96.00 |         Hard Clay, CL |   12    |    #user-input     |
+
+...
+#exam		|  ...    |   input  | input |  Select from Module 3 | input   |    #user-input     |
+...
+
+#exam		|    6    |   96.00  | 90.00 | Medium Dense Sand, SM |   20    |    #user-input     |
+-----------
+| Add row | #Layer Input Row         → form row สำหรับแต่ละ layer
+-----------
+
+Right Side > Soil Profile > Preview
+
+           -----------------------------
+Depth (m) |	     Soil Profile	|   SPT-N    |
+           -----------------------------
+100.00	- |	Medium Dense Sand, SM	|     20     |		
+99.00	- |		Hard Clay, CL	|     12     |
+
+           -----------------------------V Water-Level = -2.00 m
+
+96.00	- |	Medium Dense Sand, SM	|      -     |
+.
+.
+90.00	- |	Medium Dense Sand, SM	|     20     |
+
+End of Boring...
+
+SOIL_TYPES object     → config สี และ pattern แต่ละ soil type
+Soil Patterns component → SVG patterns (dots, lines, etc.)
+Soil Layer component   → render แต่ละ layer
+Water Table component  → GWL indicator
+Tooltip component     → hover info popup
+Borehole Profile Viewer → main component รวมทุกอย่าง
+
+Under Right Side > Legend #List คร่าวๆ แสดงแค่ที่เลือกหรือมี Layer เท่านั้น
+
+Soil Type	Pattern
+Fill		จุดขาวบนพื้นเทาเข้ม
+Topsoil		เส้นคลื่น + จุด
+
+Very Soft Clay	ไม่มีเส้นนอน
+Soft Clay	เส้นนอน sparse
+Medium Clay	เส้นนอน dense
+Stiff Clay	เส้นนอนหนา
+Hard Clay	เส้นนอนหนา+เส้นตั้ง
+
+Loose Sand	stipple เบา
+Medium Sand	stipple กลาง
+Dense Sand	stipple กลาง-เข้ม
+Very Dense Sand	stipple  หนัก
+Gravel		วงกลม + จุดทึบ
+Rock		เส้นทแยง
+
+Module 6: Cross-section - Soil Profile
+
+> Cross-section → Interpolate layers between boreholes #Data from Module 3 only
+
+Top bar > Load Data
+
+> Wide Preview Left to Right Screen
+Appear Y-axis = Elevation/Depth (m) and X-axis Distance (m)/Optional input if not show as default.
+
+	^
+	|	BH1 GL:99.7			BH3 GL:99.7
+	|			BH2 GL:99.5				BH4 GL:99.5
+	|					
+	|
+	|
+Elevation/Depth (m)|
+	|
+	|
+	|
+	|
+	|	
+	|________________________________________________________________________>
+				Distance (m)
+###Exam out put
+┌─────────────────────────────────────────────────┐
+│            GEOLOGICAL CROSS-SECTION             │
+│                                                 │
+│  BH-01      BH-02        BH-03        BH-04    │
+│    │          │            │            │       │
+│  ──┼──      ──┼──        ──┼──        ──┼──    │ ← Ground Surface
+│  ┌─┴─┐      ┌─┴─┐        ┌─┴─┐        ┌─┴─┐    │
+│  │   │╲    ╱│   │╲      ╱│   │╲      ╱│   │    │ ← Fill
+│  ├───┤ ╲  ╱ ├───┤ ╲    ╱ ├───┤ ╲    ╱ ├───┤    │
+│  │   │  ╲╱  │   │  ╲  ╱  │   │  ╲  ╱  │   │    │ ← Clay
+│  │   │  ╱╲  │   │   ╲╱   │   │   ╲╱   │   │    │
+│  ├───┤ ╱  ╲ ├───┤   ╱╲   ├───┤   ╱╲   ├───┤    │ ← Sand
+│  │   │╱    ╲│   │  ╱  ╲  │   │  ╱  ╲  │   │    │
+│  └───┘      └───┘ ╱    ╲ └───┘ ╱    ╲ └───┘    │ ← Rock
+│                                                 │
+│  0m        30m         65m         100m         │
+│  ←───────── CHAINAGE (m) ──────────→           │
+└─────────────────────────────────────────────────┘
+
+
+> Soil Type Legend
+	...
+> Borehole Data> order from Left to Right side
+	Table for each BH 
+	#Header		| Soil Type | From  | To    |  N |
+	#data....
+	#Last row	| SoftClay  | 18.00 | 22.00 | 50 |
+
+		WL. = -2.0 m Total Depth 22.0 m
+
+
+
+
+
+
+

@@ -1,0 +1,43 @@
+# ===========================================
+# Ground Param v 1.1.0.0
+# Requirements for PyInstaller build
+# ===========================================
+
+# PyQt6 - Modern Qt bindings for Python (GUI Framework)
+PyQt6>=6.6.0
+
+# Matplotlib - For plotting graphs and visualizations
+matplotlib>=3.8.0
+
+# NumPy - For numerical calculations
+numpy>=1.26.0
+
+# Pandas - For data manipulation and Excel export
+pandas>=2.1.0
+
+# OpenPyXL - For Excel file support (.xlsx)
+openpyxl>=3.1.0
+
+# Pillow - For image processing
+Pillow>=10.0.0
+
+# Supabase - Backend as a Service (Auth + Database)
+supabase>=2.0.0
+
+# python-dotenv - Load environment variables from .env
+python-dotenv>=1.0.0
+
+# ===========================================
+# Build Tools (Development only)
+# ===========================================
+
+# PyInstaller - For creating executable
+PyInstaller>=6.0.0
+
+# ===========================================
+# Installation:
+# pip install -r requirements.txt
+#
+# Build executable:
+# pyinstaller --clean Geotech.spec
+# ===========================================

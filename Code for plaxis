@@ -1,0 +1,191 @@
+Soil_Model = [
+    "Mohr-Coulomb" = 2
+
+] 	
+
+Drainage_Type = [
+    "Drained" = 0,
+    "Undrained A" = 1,
+    "Undrained B" = 2,
+    "Undrained C" = 3,
+    "Non-porous" = 4
+
+] 	
+
+Classification = [
+    "Standard" = 0,
+    "Hypres" = 1,
+    "USDA" = 2,
+    "Staring" = 3
+]
+
+Standard = [
+    "Coarse" = 0,
+    "Medium" = 1,
+    "Medium fine" = 2,
+    "Fine" = 3,
+    "Very fine" = 4,
+    "Organic" = 5
+]
+
+USDA = [
+    "Sand" = 0,
+    "Loamy sand" = 1,
+    "Sandy loam" = 2,
+    "Loam" = 3,
+    "Silt" = 4,
+    "Silt loam" = 5,
+    "Sandy clay loam" = 6,
+    "Clay loam" = 7,
+    "Silty clay loam" = 8,
+    "Sandy clay" = 9,
+    "Silty clay" = 10,
+    "Clay" = 11
+]
+
+
+Peameabilities = ["TURE"=TRUE, "FASLE"=FALSE]
+
+Defaults_method = [
+    "From data set" = 0,
+    "From grain size distribution" = 1,
+]
+
+Strength_determination = [
+    "Rigid" = 0,
+    "Manual" = 1
+
+]
+
+K0_determination = [
+    "Automatic" = 0,
+    "Manual" = 1
+]
+
+Loop =[
+    //Step 1 ตั้งค่า soil contour
+    // xmin=-30 xmax=70
+    // ymin=0 ymax=100
+    _initializerectangular SoilContour -30 0 70 100
+
+    //Step 2 สร้าง Soil Material
+    //ตั้งชื่อ และ properties ทุกอย่างให้ตรงตามที่กำหนด
+    _soilmat "SoilModel" "Mohr-Coulomb"
+    _set SoilMat_1.Identification "01 Sand, Medium Dense"
+    _set SandMediumDense.gammaUnsat 15.5
+    _set SandMediumDense.gammaSat 16.5
+    _set SandMediumDense.ERef 10000
+    _set SandMediumDense.nu 0.3
+    _set SandMediumDense.cRef 0.1
+    _set SandMediumDense.phi 30
+    _set SandMediumDense.GroundwaterClassificationType "USDA"
+    _set SandMediumDense.GroundwaterSoilClassUSDA "Sandy loam"
+    _set SandMediumDense.GwUseDefaults True
+    _set SandMediumDense.GwDefaultsMethod "From grain size distribution"
+    _set SandMediumDense.InterfaceStrengthDetermination "Manual"
+    _set SandMediumDense.Rinter 0.8
+    _set SandMediumDense.K0Determination "Manual"
+    _set SandMediumDense.K0Primary 0.43
+    //จากนั้น loops จนครบจำนวน
+
+    //Step 3 สร้าง Borehole
+    _borehole -1 // Position x = -1
+    _soillayer 0
+    _soillayer 0
+    _soillayer 0
+    _soillayer 0
+    _set Soillayer_1.Soil.Material SandMediumDense
+    _set Soillayer_2.Soil.Material SandMediumDense_2
+    _set Soillayer_3.Soil.Material SandMediumDense_3
+    _set Soillayer_4.Soil.Material SandMediumDense
+    _set Soillayer_1.Zones[0].Top 100       // มาจาก From
+    _set Soillayer_1.Zones[0].Bottom 95     //มาจาก To
+    _set Soillayer_2.Zones[0].Bottom 85     //มาจาก To
+    _set Soillayer_3.Zones[0].Bottom 75     //มาจาก To
+    _set Soillayer_4.Zones[0].Bottom 65     //มาจาก To
+
+
+
+    //Step 4 Staged construction กำหนด Phase auto
+    _gotostages
+    _set InitialPhase.DeformCalcType "Gravity loading"
+    _phase InitialPhase
+    _set Model.CurrentPhase Phase_1
+    _phase Phase_1
+    _set Model.CurrentPhase Phase_2
+    _phase Phase_2
+    _set Model.CurrentPhase Phase_3
+    _set Phase_3.Identification "Loading"
+    _phase Phase_3
+    _set Model.CurrentPhase Phase_4
+    _set Phase_4.Identification "LWL"
+    _set Phase_4.DeformCalcType "Safety"
+    _set Phase_4.Deform.ResetDisplacementsToZero True
+    _set Model.CurrentPhase Phase_3
+    _phase Phase_3
+    _set Model.CurrentPhase Phase_5
+    _set Phase_5.Identification "RDD"
+    _phase Phase_5
+    _set Model.CurrentPhase Phase_6
+    _set Phase_6.DeformCalcType "Safety"
+    _set Phase_6.Deform.ResetDisplacementsToZero True
+    _set Model.CurrentPhase InitialPhase
+    ]
+
+    //Step 5 Flow condition
+    _gotoflow
+    _set Model.CurrentPhase Phase_3 //ต้องเป็ย Phase ที่ชื่อว่า "loading" เท่านั้น
+    _waterlevel (-30 91) (70 91) // สร้างเส้นระดับน้ำต่ำสุด LWL จากขอบ ซ้ายไปขอบขวา
+    _waterlevel (-30 98) (0 98) (10 91) (70 91) //สร้างเส้น RDD จากขอบซ้าย (-30 98) ที่ระดับ HWL มาที่ (0,HWL) ไปที่ (10,LWL) และสิ้นสุดที่ขอบ ขวา (70, LWL)
+    
+
+
+    //Step 4 Staged construction เพิ่ม
+    โดย
+    InitialPhase > Calcualtion type column มี dropdown list ดังนี้
+        InitialPhase_Calcualtion_type = [
+            "K0 procedure" = 0,
+            "Field stress" = 1,
+            "Gravity loading" = 2
+        ]
+
+    Phase_1 > Calcualtion type column มี dropdown list ดังนี้ Link InitialPhase
+        Phase_Calcualtion_type = [
+            "Plastic" = 0,
+            "Consolidation" = 1,
+            "Safety" = 2
+        ]
+    
+    Phase_2 > Calcualtion type column มี dropdown list ดังนี้ Link Phase_1
+        Phase_Calcualtion_type = [
+            "Plastic" = 0,
+            "Consolidation" = 1,
+            "Safety" = 2
+        ]
+
+    Phase_3 > Calcualtion type column มี dropdown list ดังนี้ Link Phase_1 
+        Phase_Calcualtion_type = [
+            "Plastic" = 0,
+            "Consolidation" = 1,
+            "Safety" = 2
+        ]
+    ตัวอย่างคำสั่ง
+    _set InitialPhase.DeformCalcType "Gravity loading" //การเปลี่ยน Calcualtion type เป็น Gravity loading
+    _set Model.CurrentPhase Phase_4 //การเพิ่ม phase
+    _set Phase_4.PreviousPhase Phase_1 //การ Link phase 4 ต่อจาก phase 1
+    _set Phase_2.DeformCalcType "Safety" //การเปลี่ยน phase 2 Calcualtion type เป็น Safety
+
+    ใน Pore pressure calculation type = [
+        "Phreatic" = 0,
+        "Use pressures from previous phase" = 1,
+        "Steady state groundwater flow" = 2
+    ]
+    ในส่วนนี้ใน Dropdown list เพื่อใช้ยิงคำสั่งแต่ละ phase
+    ตัวอย่างคำสั่ง
+    _set Phase_3.PorePresCalcType "Phreatic"
+
+
+    ใน ResetDisplacementsToZero = [ TRUE,FALSE]
+    ในส่วนนี้ใน Dropdown list เพื่อใช้ยิงคำสั่งแต่ละ phase
+    ตัวอย่างคำสั่ง
+    _set Phase_3.Deform.ResetDisplacementsToZero True

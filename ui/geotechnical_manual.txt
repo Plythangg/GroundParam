@@ -1,0 +1,135 @@
+Geotechnical Parameters Calculation Manual
+
+Engineering Reference for Subsurface Design & Analysis
+
+1. Soil Classification and Unit Weight
+
+    1.1 Soil Classification (USCS-Based)
+
+    Soils are classified based on the Unified Soil Classification System (USCS) and grouped by mechanical behavior.
+
+    | USCS Code     | Soil Type | Engineering Behavior                        |
+    | ------------- | --------- | ------------------------------------------- |
+    | CL, CH        | **Clay**  | Cohesive soil (undrained behavior dominant) |
+    | SM, SC, SP–SM | **Sand**  | Granular soil (drained behavior dominant)   |
+
+    1.2 Saturated Unit Weight Estimation (γ<sub>sat</sub>)
+
+    The saturated unit weight is estimated empirically from SPT N-value, reflecting soil density and consistency.
+
+    | SPT N-value (blows/ft) | γ<sub>sat</sub> (kN/m³) | Description             |
+    | ---------------------- | ----------------------- | ----------------------- |
+    | 0                      | 0                       | N/A                     |
+    | < 5                    | 15                      | Very Soft / Very Loose  |
+    | 5 – 7                  | 16                      | Soft / Loose            |
+    | 8 – 10                 | 17                      | Medium                  |
+    | 11 – 26                | 18                      | Stiff / Dense           |
+    | 27 – 34                | 19                      | Very Stiff / Very Dense |
+    | ≥ 35                   | 20                      | Hard / Very Dense       |
+
+2. Vertical Effective Stress Analysis
+
+    2.1 Fundamental Principle
+
+Vertical effective stress is computed as:
+
+        σv′​=∑(γ⋅Δz)−u
+
+Where
+
+    σv′= vertical effective stress
+    γ= unit weight of soil
+    Δz = thickness of soil layer
+    𝑢 = pore water pressure 
+
+    2.2 Stress Increment by Groundwater Condition
+
+    | Condition             | Increment Equation                   | Explanation                         |
+    | --------------------- | ------------------------------------ | ----------------------------------- |
+    | **Above Water Table** | σv,i′ = σv,i-1′ + γsatΔz             | Full soil weight applied            |
+    | **Below Water Table** | σv,i′ = σv,i-1′ + (γsat-γw)Δz        | Buoyant unit weight                 |
+    |                       |                                      | γw = 9.81 , kN/m^3                  |
+
+3. SPT N-Value Corrections
+
+    3.1 Overburden Correction Factor (C<sub>N</sub>)
+    According to Liao & Whitman (1986):
+
+        CN​= σv′​100​    ​(σv′​ in kN/m2)
+
+    3.2 Corrected N-Value (N<sub>cor</sub>)
+
+        | Soil Type | Method          | Equation                                                |
+        | --------- | --------------- | ------------------------------------------------------- |
+        | Sand      | Liao & Whitman  | (N_{cor} = C_N \cdot N_{field})                         |
+        | Sand      | Terzaghi (1984) | (N \le 15: N_{cor}=N) <br> (N>15: N_{cor}=15+0.5(N-15)) |
+        | Clay      | –               | (N_{cor} = N_{field})                                   |
+
+4. Strength Parameters
+
+    4.1 Clay – Undrained Shear Strength (S<sub>u</sub>)
+
+        Su​=α⋅Ncor​⋅Pa​(Pa​=9.81kN/m2)
+
+        | Clay Type            | α      | Reference     |
+        | -------------------- | ------ | ------------- |
+        | CH (High Plasticity) | 0.6739 | Stroud (1974) |
+        | CL (Low Plasticity)  | 0.5077 | Stroud (1974) |
+
+    4.2 Sand – Effective Friction Angle (φ′)
+
+        ϕ′=27.1+0.3Ncor​−0.00054Ncor2​      Reference: Peck, Hanson & Thornburn (1974)
+
+5. Stiffness and Elastic Properties
+
+    5.1 Young’s Modulus (E)
+
+    Clay: E=β⋅Su
+
+        | Structure Type  | Su Range            | E Relationship     |
+        | --------------- | ------------------- | ------------------ |
+        | Sheet Pile      | ≤ 2.5               | 150 Su             |
+        |                 | > 5                 | 500 Su             |
+        | Earth Retaining | ≤ 2.5               | 250 Su             |
+        | Diaphragm Wall  | > 5                 | 1000 Su            |
+
+    Sand: E′=β⋅Ncor
+
+        | Structure       | Equation           |
+        | --------------- | ------------------ |
+        | Earth Retaining | (E' = 1000Ncor     |
+        | Diaphragm Wall  | (E' = 2000Ncor     |
+
+    5.2 Poisson’s Ratio (ν)
+
+        | Soil Type | ν     | Condition |
+        | --------- | ----- | --------- |
+        | Clay      | 0.495 | Undrained |
+        | Sand      | 0.333 | Drained   |
+
+6. Earth Pressure and Interface Parameters
+
+    6.1 At-Rest Earth Pressure (K₀)
+
+        | Soil | Formula                              |
+        | ---- | ------------------------------------ |
+        | Sand | (K0 = 1 - sin/phi')    (Jaky, 1944)  |
+        | Clay | Sheet pile = 0.65 <br> Others = 0.80 |
+
+    6.2 Interface Friction Ratio (Rint)
+
+        | Soil | Surface Condition                            | Rint            |
+        | ---- | -------------------------------------------- | --------------- |
+        | Clay | Bored                                        | 0.45            |
+        | Clay | Driven (Su < 2.5 → 1.0, ≥7.5 → 0.5)          | Linear interp.  |
+        | Sand | Concrete (Rough)                             | 1.0             |
+        | Sand | Concrete (Smooth)                            | 0.8             |
+        | Sand | Steel (Smooth)                               | 0.5             |
+
+**Design Philosophy Summary**
+
+    - SPT-based correlations are used consistently
+    - Effective stress principle governs all strength & stiffness
+    - Soil–structure interaction explicitly considered
+    - Conservative values adopted for design safety
+

@@ -1,0 +1,35 @@
+# Environment & Secrets
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
+
+# Windows junk
+nul
+Thumbs.db
+Desktop.ini
+
+# OS
+.DS_Store

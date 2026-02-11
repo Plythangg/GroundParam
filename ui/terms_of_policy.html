@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Terms of Policy - Ground Param</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Arial, sans-serif;
+            line-height: 1.8;
+            margin: 40px;
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+        }
+        .subtitle {
+            color: #555;
+            font-style: italic;
+            margin-top: 0;
+            margin-bottom: 35px;
+            font-size: 0.95em;
+        }
+        h2 {
+            border-bottom: 1px solid #7f8c8d;
+            padding-bottom: 6px;
+            margin-top: 45px;
+            font-size: 1.4em;
+        }
+        h3 {
+            margin-top: 30px;
+            font-size: 1.15em;
+            color: #34495e;
+        }
+        ul, ol {
+            margin-left: 25px;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            width: 100%;
+            font-size: 0.92em;
+            border: 1px solid #95a5a6;
+        }
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #bdc3c7;
+        }
+        th {
+            background-color: #ecf0f1;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .policy-box {
+            background-color: #f8f9fa;
+            border: 1px solid #d0d0d0;
+            border-left: 3px solid #2c3e50;
+            padding: 15px 20px;
+            margin: 18px 0;
+        }
+        .lang-section {
+            margin-bottom: 50px;
+        }
+        .lang-divider {
+            border-top: 2px dashed #bdc3c7;
+            margin: 50px 0;
+        }
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #bdc3c7;
+            font-size: 0.88em;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        .version {
+            text-align: right;
+            color: #7f8c8d;
+            font-size: 0.88em;
+            margin-bottom: 25px;
+        }
+        code {
+            background-color: #ecf0f1;
+            padding: 3px 7px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ENGLISH VERSION -->
+<div class="lang-section">
+<h1>Terms of Policy</h1>
+<p class="subtitle">Terms and Conditions of Use</p>
+<p class="version">Version 3.0 | Effective Date: January 2026</p>
+
+<h2>1. Program Purpose</h2>
+
+<div class="policy-box">
+    <p><b>Ground Param v 1.1.0.0</b> has been developed to:</p>
+    <ul>
+        <li>Analyze and calculate geotechnical parameters from SPT (Standard Penetration Test) data</li>
+        <li>Process field and laboratory data systematically</li>
+        <li>Generate graphs and reports to support geotechnical engineering design</li>
+        <li>Improve efficiency and accuracy in data analysis processes</li>
+        <li>Reduce time required for preliminary calculations and reporting</li>
+    </ul>
+</div>
+
+<h2>2. Scope of Use</h2>
+
+<h3>2.1 Appropriate Use</h3>
+<p>This program is designed for:</p>
+<ul>
+    <li><b>Preliminary Analysis:</b> Initial assessment of soil parameters in early project stages</li>
+    <li><b>Feasibility Study:</b> Evaluation of construction project viability</li>
+    <li><b>Preliminary Design:</b> Parameter calculation for preliminary design purposes</li>
+    <li><b>Sanity Check:</b> Comparison of obtained values against standard values</li>
+    <li><b>Educational Purpose:</b> Learning geotechnical calculation principles</li>
+</ul>
+
+<h3>2.2 Usage Limitations</h3>
+<div class="policy-box">
+    <p><b>This program is NOT designed for:</b></p>
+    <ul style="margin: 5px 0;">
+        <li>Final design analysis without verification by qualified engineers</li>
+        <li>Use as the sole tool for highly complex structural design</li>
+        <li>Replacement of laboratory testing and field investigation</li>
+        <li>Use in special conditions or complex geological scenarios</li>
+    </ul>
+</div>
+
+<h2>3. Engineering Principles</h2>
+
+<div class="policy-box">
+    <h3>3.1 Theoretical Basis and Calculations</h3>
+    <p>This program uses internationally recognized engineering equations and principles:</p>
+
+    <table>
+    <tr><th>Parameter</th><th>Calculation Method</th><th>Reference</th></tr>
+    <tr>
+        <td>Overburden Correction (C<sub>N</sub>)</td>
+        <td>C<sub>N</sub> = √(100/σ'<sub>v</sub>)</td>
+        <td>Liao & Whitman (1986)</td>
+    </tr>
+    <tr>
+        <td>Corrected N-value (Sand)</td>
+        <td>N<sub>cor</sub> = C<sub>N</sub> · N<sub>field</sub></td>
+        <td>Terzaghi (1984)</td>
+    </tr>
+    <tr>
+        <td>Undrained Shear Strength (Clay)</td>
+        <td>S<sub>u</sub> = α · N<sub>cor</sub> · P<sub>a</sub></td>
+        <td>Stroud (1974)</td>
+    </tr>
+    <tr>
+        <td>Friction Angle (Sand)</td>
+        <td>φ' = 27.1 + 0.3N<sub>cor</sub> - 0.00054N<sub>cor</sub>²</td>
+        <td>Peck, Hanson & Thornburn (1974)</td>
+    </tr>
+    <tr>
+        <td>At-Rest Earth Pressure (Sand)</td>
+        <td>K<sub>0</sub> = 1 - sin(φ')</td>
+        <td>Jaky (1944)</td>
+    </tr>
+    <tr>
+        <td>Effective Stress</td>
+        <td>σ'<sub>v</sub> = Σ(γ·Δz) - u</td>
+        <td>Terzaghi's Principle</td>
+    </tr>
+    </table>
+</div>
+
+<div class="policy-box">
+    <p><b>Note:</b></p>
+    <ul style="margin: 5px 0;">
+        <li>All equations and constants have been verified against international engineering standards</li>
+        <li>Detailed calculation methods are available in Help → References</li>
+        <li>Parameters obtained from calculations are approximate values based on SPT correlations</li>
+    </ul>
+</div>
+
+<h2>4. Responsibilities and Limitations</h2>
+
+<div class="policy-box">
+    <h3>4.1 Use of Engineering Judgment</h3>
+    <p><b>Users must apply engineering judgment when using calculation results:</b></p>
+    <ul style="margin: 10px 0;">
+        <li><b>Verify Reasonableness:</b> Results must be consistent with site topography and geology</li>
+        <li><b>Compare with Other Data:</b> Cross-check with laboratory test data or local experience</li>
+        <li><b>Consider Limitations:</b> SPT correlations have inherent uncertainties and may not suit all soil types</li>
+        <li><b>Consult Experts:</b> For large or complex projects, consult experienced engineers</li>
+        <li><b>Additional Testing:</b> Conduct further testing if abnormalities or uncertainties are found</li>
+    </ul>
+</div>
+
+<h3>4.2 Limitations of SPT Correlation</h3>
+<div class="policy-box">
+    <p><b>Users should be aware of the following limitations:</b></p>
+    <ul style="margin: 5px 0;">
+        <li>SPT correlations are empirical approximations, not direct test values</li>
+        <li>Accuracy depends on the quality of field SPT testing</li>
+        <li>Certain soil types (e.g., Organic soil, Peat, Gravel) may yield unreliable results</li>
+        <li>Special conditions (Dynamic loading, Seismic, Liquefaction) require additional analysis</li>
+        <li>Very high N-values (>50) or very low values (<2) may have high uncertainties</li>
+    </ul>
+</div>
+
+<h3>4.3 User Responsibilities</h3>
+<div class="policy-box">
+    <p>Users of this program are responsible for:</p>
+    <ol>
+        <li><b>Accurate Data Input:</b> SPT data, groundwater level, and soil classification must be correct</li>
+        <li><b>Appropriate Parameter Selection:</b> Structure Type and Surface Condition must match actual project</li>
+        <li><b>Results Verification:</b> Users must verify the reasonableness of obtained results</li>
+        <li><b>Data Preservation:</b> Regularly save projects and maintain data backups</li>
+        <li><b>Standards Compliance:</b> Apply results according to engineering standards and regulatory requirements</li>
+    </ol>
+</div>
+
+<h2>5. Warranty and Liability Limitations</h2>
+
+<div class="policy-box">
+    <h3>5.1 Disclaimer</h3>
+    <p><b>This program is provided as a preliminary calculation tool only:</b></p>
+    <ul style="margin: 10px 0;">
+        <li>Developers assume no liability for any damages resulting from program use</li>
+        <li>Users are responsible for design decisions and application of results</li>
+        <li>All calculations should be reviewed by licensed professional engineers</li>
+        <li>This program does not replace education, experience, and engineering judgment</li>
+        <li>Users should comply with relevant laws and regulations in their jurisdiction</li>
+    </ul>
+</div>
+
+<h3>5.2 Terms of Use</h3>
+<p>By using this program, users agree to:</p>
+<ul>
+    <li>Use the program reasonably and correctly according to academic principles</li>
+    <li>Not use the program in ways that may endanger life or property</li>
+    <li>Verify and review calculation results before practical application</li>
+    <li>Maintain records of data and analysis results as evidence</li>
+    <li>Comply with engineering standards and regulations of the country of use</li>
+</ul>
+
+<h2>6. User Qualifications and Requirements</h2>
+
+<div class="policy-box">
+    <h3>6.1 Appropriate Users</h3>
+    <p>This program is suitable for:</p>
+    <ul>
+        <li><b>Geotechnical Engineers:</b> Professionals with knowledge and experience in geotechnical engineering</li>
+        <li><b>Civil Engineers:</b> Those with fundamental knowledge of soil mechanics and foundations</li>
+        <li><b>Engineering Students:</b> For study and practice in calculations</li>
+        <li><b>Assistant Engineers:</b> Under the supervision of experienced engineers</li>
+    </ul>
+
+    <h3>6.2 Required Background Knowledge</h3>
+    <p>Users should have basic knowledge of:</p>
+    <ul>
+        <li>Soil Mechanics and Foundation Engineering</li>
+        <li>Standard Penetration Test (SPT) and N-value interpretation</li>
+        <li>Soil classification systems (USCS, AASHTO)</li>
+        <li>Effective stress analysis and pore water pressure principles</li>
+        <li>Reading and interpreting soil investigation reports</li>
+    </ul>
+</div>
+
+<h2>7. Updates and Development</h2>
+
+<div class="policy-box">
+    <p><b>Program Development:</b></p>
+    <ul style="margin: 5px 0;">
+        <li>The program may be updated and modified to improve accuracy and efficiency</li>
+        <li>Users should verify their current version and update to the latest release</li>
+        <li>If errors are found or suggestions arise, please contact the developer</li>
+    </ul>
+</div>
+
+<h2>8. Acceptance of Terms</h2>
+
+<div class="policy-box">
+    <p><b>Use of Ground Param v 1.1.0.0 constitutes acknowledgment that the user has read, understood, and accepted all terms and conditions stated in this document.</b></p>
+
+    <p style="margin-top: 15px;"><b>If you do not accept these terms, please discontinue use of the program immediately.</b></p>
+</div>
+
+<h2>9. Contact Information</h2>
+
+<div class="policy-box">
+    <p>For questions or suggestions regarding the program:</p>
+    <ul>
+        <li><b>Program:</b> Ground Param</li>
+        <li><b>Version:</b> 3.0</li>
+        <li><b>Based on:</b> SPT Empirical Correlations (International Standards)</li>
+        <li><b>User Guide:</b> Help → User Guide</li>
+        <li><b>Technical Reference:</b> Help → References</li>
+    </ul>
+</div>
+
+<footer>
+    <b>Ground Param v 1.1.0.0</b><br>
+    Terms of Policy - English Version<br>
+    <i>By using this software, you agree to use engineering judgment and professional responsibility in applying the calculated parameters to actual design work.</i>
+</footer>
+</div>
+
+<!-- LANGUAGE DIVIDER -->
+<div class="lang-divider"></div>
+
+<!-- THAI VERSION -->
+<div class="lang-section">
+<h1>ข้อกำหนดและนโยบายการใช้งาน</h1>
+<p class="subtitle">เงื่อนไขการใช้โปรแกรม</p>
+<p class="version">เวอร์ชัน 3.0 | มีผลบังคับใช้: มกราคม 2569</p>
+
+<h2>1. วัตถุประสงค์ของโปรแกรม</h2>
+
+<div class="policy-box">
+    <p>โปรแกรม <b>Ground Param v 1.1.0.0</b> ได้รับการพัฒนาขึ้นเพื่อ:</p>
+    <ul>
+        <li>ช่วยวิเคราะห์และคำนวณพารามิเตอร์ทางปฐพีกลศาสตร์จากข้อมูล SPT (Standard Penetration Test)</li>
+        <li>ประมวลผลข้อมูลภาคสนามและห้องปฏิบัติการอย่างเป็นระบบ</li>
+        <li>สร้างกราฟและรายงานเพื่อสนับสนุนการออกแบบทางวิศวกรรมปฐพีกลศาสตร์</li>
+        <li>เพิ่มประสิทธิภาพและความแม่นยำในกระบวนการวิเคราะห์ข้อมูล</li>
+        <li>ลดเวลาในการคำนวณและจัดทำรายงานเบื้องต้น</li>
+    </ul>
+</div>
+
+<h2>2. ขอบเขตการใช้งาน</h2>
+
+<h3>2.1 การใช้งานที่เหมาะสม</h3>
+<p>โปรแกรมนี้ออกแบบมาสำหรับ:</p>
+<ul>
+    <li><b>การวิเคราะห์เบื้องต้น (Preliminary Analysis):</b> การประเมินพารามิเตอร์ดินในระยะเริ่มต้นของโครงการ</li>
+    <li><b>การศึกษาความเป็นไปได้ (Feasibility Study):</b> การประเมินความเหมาะสมของโครงการก่อสร้าง</li>
+    <li><b>การออกแบบเบื้องต้น (Preliminary Design):</b> การคำนวณพารามิเตอร์เพื่อใช้ในการออกแบบเบื้องต้น</li>
+    <li><b>การตรวจสอบความสมเหตุสมผล (Sanity Check):</b> การเปรียบเทียบค่าที่ได้กับค่ามาตรฐาน</li>
+    <li><b>การศึกษาและการสอน (Educational Purpose):</b> การเรียนรู้หลักการคำนวณทางปฐพีกลศาสตร์</li>
+</ul>
+
+<h3>2.2 ข้อจำกัดการใช้งาน</h3>
+<div class="policy-box">
+    <p><b>โปรแกรมนี้ไม่ได้ออกแบบมาเพื่อ:</b></p>
+    <ul style="margin: 5px 0;">
+        <li>ทดแทนการวิเคราะห์ขั้นสุดท้าย (Final Design) โดยไม่มีการตรวจสอบจากวิศวกรผู้เชี่ยวชาญ</li>
+        <li>ใช้เป็นเครื่องมือเดียวในการออกแบบโครงสร้างที่มีความซับซ้อนสูง</li>
+        <li>ทดแทนการทดสอบในห้องปฏิบัติการและการตรวจสอบภาคสนาม</li>
+        <li>ใช้ในกรณีที่มีสภาวะพิเศษหรือเงื่อนไขทางธรณีวิทยาที่ซับซ้อน</li>
+    </ul>
+</div>
+
+<h2>3. หลักการทางวิศวกรรม</h2>
+
+<div class="policy-box">
+    <h3>3.1 ฐานทฤษฎีและการคำนวณ</h3>
+    <p>โปรแกรมนี้ใช้สมการและหลักการทางวิศวกรรมที่ได้รับการยอมรับในระดับสากล ดังนี้:</p>
+
+    <table>
+    <tr><th>พารามิเตอร์</th><th>วิธีการคำนวณ</th><th>อ้างอิง</th></tr>
+    <tr>
+        <td>การปรับแก้หน่วยแรงบรรทุก (C<sub>N</sub>)</td>
+        <td>C<sub>N</sub> = √(100/σ'<sub>v</sub>)</td>
+        <td>Liao & Whitman (1986)</td>
+    </tr>
+    <tr>
+        <td>ค่า N ที่ปรับแก้แล้ว (ทราย)</td>
+        <td>N<sub>cor</sub> = C<sub>N</sub> · N<sub>field</sub></td>
+        <td>Terzaghi (1984)</td>
+    </tr>
+    <tr>
+        <td>กำลังรับแรงเฉือนแบบไม่ระบายน้ำ (ดินเหนียว)</td>
+        <td>S<sub>u</sub> = α · N<sub>cor</sub> · P<sub>a</sub></td>
+        <td>Stroud (1974)</td>
+    </tr>
+    <tr>
+        <td>มุมเสียดทาน (ทราย)</td>
+        <td>φ' = 27.1 + 0.3N<sub>cor</sub> - 0.00054N<sub>cor</sub>²</td>
+        <td>Peck, Hanson & Thornburn (1974)</td>
+    </tr>
+    <tr>
+        <td>ค่าสัมประสิทธิ์แรงดันดินขณะหยุดนิ่ง (ทราย)</td>
+        <td>K<sub>0</sub> = 1 - sin(φ')</td>
+        <td>Jaky (1944)</td>
+    </tr>
+    <tr>
+        <td>หน่วยแรงประสิทธิผล</td>
+        <td>σ'<sub>v</sub> = Σ(γ·Δz) - u</td>
+        <td>หลักการของ Terzaghi</td>
+    </tr>
+    </table>
+</div>
+
+<div class="policy-box">
+    <p><b>หมายเหตุ:</b></p>
+    <ul style="margin: 5px 0;">
+        <li>สมการและค่าคงที่ทั้งหมดได้รับการตรวจสอบตามมาตรฐานวิศวกรรมสากล</li>
+        <li>รายละเอียดการคำนวณสามารถดูได้ที่ Help → References</li>
+        <li>ค่าพารามิเตอร์ที่ได้จากการคำนวณเป็นค่าโดยประมาณจาก SPT correlation</li>
+    </ul>
+</div>
+
+<h2>4. ความรับผิดชอบและข้อจำกัด</h2>
+
+<div class="policy-box">
+    <h3>4.1 การใช้วิจารณญาณทางวิศวกรรม</h3>
+    <p><b>ผู้ใช้งานต้องใช้วิจารณญาณทางวิศวกรรม (Engineering Judgment) ในการนำผลการคำนวณไปใช้งาน โดย:</b></p>
+    <ul style="margin: 10px 0;">
+        <li><b>ตรวจสอบความสมเหตุสมผล:</b> ผลที่ได้ต้องสอดคล้องกับสภาพภูมิประเทศและธรณีวิทยาของพื้นที่</li>
+        <li><b>เปรียบเทียบกับข้อมูลอื่น:</b> ควรมีการตรวจสอบผลกับข้อมูล Lab test หรือประสบการณ์ในพื้นที่</li>
+        <li><b>คำนึงถึงข้อจำกัด:</b> SPT correlation มีความไม่แน่นอนและอาจไม่เหมาะกับดินบางประเภท</li>
+        <li><b>ปรึกษาผู้เชี่ยวชาญ:</b> กรณีโครงการขนาดใหญ่หรือมีความซับซ้อน ควรปรึกษาวิศวกรที่มีประสบการณ์</li>
+        <li><b>ทดสอบเพิ่มเติม:</b> หากพบความผิดปกติหรือไม่แน่ใจ ควรทำการทดสอบเพิ่มเติม</li>
+    </ul>
+</div>
+
+<h3>4.2 ข้อจำกัดของ SPT Correlation</h3>
+<div class="policy-box">
+    <p><b>ผู้ใช้ควรตระหนักถึงข้อจำกัดต่อไปนี้:</b></p>
+    <ul style="margin: 5px 0;">
+        <li>SPT correlation เป็นการประมาณค่าเชิงประจักษ์ (Empirical) ไม่ใช่ค่าจากการทดสอบโดยตรง</li>
+        <li>ความแม่นยำขึ้นอยู่กับคุณภาพการทดสอบ SPT ในภาคสนาม</li>
+        <li>ดินบางประเภท (เช่น Organic soil, Peat, Gravel) อาจให้ผลที่ไม่น่าเชื่อถือ</li>
+        <li>สภาวะพิเศษ (Dynamic loading, Seismic, Liquefaction) ต้องการการวิเคราะห์เพิ่มเติม</li>
+        <li>ค่า N-value ที่สูงมาก (>50) หรือต่ำมาก (<2) อาจมีความคลาดเคลื่อนสูง</li>
+    </ul>
+</div>
+
+<h3>4.3 ความรับผิดชอบของผู้ใช้งาน</h3>
+<div class="policy-box">
+    <p>ผู้ใช้งานโปรแกรมนี้มีความรับผิดชอบในการ:</p>
+    <ol>
+        <li><b>กรอกข้อมูลที่ถูกต้อง:</b> ข้อมูล SPT, ระดับน้ำใต้ดิน, และการจำแนกประเภทดินต้องถูกต้อง</li>
+        <li><b>เลือกพารามิเตอร์ที่เหมาะสม:</b> Structure Type, Surface Condition ต้องสอดคล้องกับโครงการจริง</li>
+        <li><b>ตรวจสอบผลลัพธ์:</b> ผู้ใช้ต้องตรวจสอบความสมเหตุสมผลของผลที่ได้</li>
+        <li><b>เก็บรักษาข้อมูล:</b> บันทึกโครงการและเก็บ backup ข้อมูลอย่างสม่ำเสมอ</li>
+        <li><b>ปฏิบัติตามมาตรฐาน:</b> นำผลไปใช้ตามมาตรฐานวิศวกรรมและข้อกำหนดของหน่วยงาน</li>
+    </ol>
+</div>
+
+<h2>5. การรับประกันและข้อจำกัดความรับผิด</h2>
+
+<div class="policy-box">
+    <h3>5.1 ข้อจำกัดความรับผิด (Disclaimer)</h3>
+    <p><b>โปรแกรมนี้จัดทำขึ้นเพื่อเป็นเครื่องมือช่วยในการคำนวณเบื้องต้นเท่านั้น:</b></p>
+    <ul style="margin: 10px 0;">
+        <li>ผู้พัฒนาไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการใช้โปรแกรม</li>
+        <li>ผู้ใช้งานต้องรับผิดชอบในการตัดสินใจออกแบบและการนำผลไปใช้</li>
+        <li>การคำนวณทั้งหมดควรได้รับการตรวจสอบโดยวิศวกรผู้มีใบอนุญาตประกอบวิชาชีพ</li>
+        <li>โปรแกรมไม่ทดแทนการศึกษา ประสบการณ์ และวิจารณญาณของวิศวกร</li>
+        <li>ผู้ใช้ควรปฏิบัติตามกฎหมายและข้อบังคับที่เกี่ยวข้องในแต่ละประเทศ</li>
+    </ul>
+</div>
+
+<h3>5.2 ข้อกำหนดการใช้งาน</h3>
+<p>การใช้โปรแกรมนี้ ผู้ใช้ตกลงที่จะ:</p>
+<ul>
+    <li>ใช้โปรแกรมในทางที่สมเหตุสมผลและถูกต้องตามหลักวิชาการ</li>
+    <li>ไม่นำโปรแกรมไปใช้ในลักษณะที่อาจก่อให้เกิดอันตรายต่อชีวิตและทรัพย์สิน</li>
+    <li>ตรวจสอบและทบทวนผลการคำนวณก่อนนำไปใช้จริง</li>
+    <li>เก็บรักษาข้อมูลและผลการวิเคราะห์ไว้เป็นหลักฐาน</li>
+    <li>ปฏิบัติตามมาตรฐานและข้อกำหนดทางวิศวกรรมของประเทศที่ใช้งาน</li>
+</ul>
+
+<h2>6. คุณสมบัติและข้อกำหนดผู้ใช้งาน</h2>
+
+<div class="policy-box">
+    <h3>6.1 ผู้ใช้งานที่เหมาะสม</h3>
+    <p>โปรแกรมนี้เหมาะสำหรับ:</p>
+    <ul>
+        <li><b>วิศวกรปฐพีกลศาสตร์:</b> ผู้มีความรู้และประสบการณ์ทางด้านปฐพีกลศาสตร์</li>
+        <li><b>วิศวกรโยธา:</b> ผู้ที่มีพื้นฐานความรู้เกี่ยวกับกลศาสตร์ดินและฐานราก</li>
+        <li><b>นักศึกษาวิศวกรรม:</b> เพื่อการศึกษาและฝึกฝนการคำนวณ</li>
+        <li><b>ผู้ช่วยวิศวกร:</b> ภายใต้การกำกับดูแลของวิศวกรผู้มีประสบการณ์</li>
+    </ul>
+
+    <h3>6.2 ความรู้พื้นฐานที่จำเป็น</h3>
+    <p>ผู้ใช้งานควรมีความรู้พื้นฐานเกี่ยวกับ:</p>
+    <ul>
+        <li>กลศาสตร์ดิน (Soil Mechanics) และฐานราก (Foundation Engineering)</li>
+        <li>Standard Penetration Test (SPT) และการแปลผล N-value</li>
+        <li>ระบบจำแนกประเภทดิน (USCS, AASHTO)</li>
+        <li>หลักการวิเคราะห์ Effective Stress และ Pore Water Pressure</li>
+        <li>การอ่านและแปลผลรายงานการสำรวจดิน (Soil Investigation Report)</li>
+    </ul>
+</div>
+
+<h2>7. การอัพเดตและการพัฒนา</h2>
+
+<div class="policy-box">
+    <p><b>การพัฒนาโปรแกรม:</b></p>
+    <ul style="margin: 5px 0;">
+        <li>โปรแกรมอาจมีการปรับปรุงและแก้ไขเพื่อเพิ่มความแม่นยำและประสิทธิภาพ</li>
+        <li>ผู้ใช้ควรตรวจสอบเวอร์ชันที่ใช้งานและอัพเดตเป็นเวอร์ชันล่าสุด</li>
+        <li>หากพบข้อผิดพลาดหรือมีข้อเสนอแนะ กรุณาติดต่อผู้พัฒนา</li>
+    </ul>
+</div>
+
+<h2>8. การยอมรับข้อกำหนด</h2>
+
+<div class="policy-box">
+    <p><b>การใช้โปรแกรม Ground Param v 1.1.0.0 ถือว่าผู้ใช้ได้อ่าน เข้าใจ และยอมรับข้อกำหนดและนโยบายทั้งหมดที่ระบุไว้ในเอกสารนี้</b></p>
+
+    <p style="margin-top: 15px;"><b>หากไม่ยอมรับข้อกำหนดเหล่านี้ กรุณาหยุดการใช้งานโปรแกรมทันที</b></p>
+</div>
+
+<h2>9. ข้อมูลการติดต่อ</h2>
+
+<div class="policy-box">
+    <p>สำหรับข้อสงสัยหรือข้อเสนอแนะเกี่ยวกับโปรแกรม:</p>
+    <ul>
+        <li><b>โปรแกรม:</b> Ground Param</li>
+        <li><b>เวอร์ชัน:</b> 3.0</li>
+        <li><b>อ้างอิงจาก:</b> SPT Empirical Correlations (มาตรฐานสากล)</li>
+        <li><b>คู่มือผู้ใช้:</b> Help → User Guide</li>
+        <li><b>เอกสารทางเทคนิค:</b> Help → References</li>
+    </ul>
+</div>
+
+<footer>
+    <b>Ground Param v 1.1.0.0</b><br>
+    ข้อกำหนดและนโยบายการใช้งาน - ฉบับภาษาไทย<br>
+    <i>การใช้โปรแกรมนี้ ผู้ใช้ตกลงที่จะใช้วิจารณญาณทางวิศวกรรมและความรับผิดชอบทางวิชาชีพในการนำพารามิเตอร์ที่คำนวณได้ไปใช้ในงานออกแบบจริง</i>
+</footer>
+</div>
+
+</body>
+</html>

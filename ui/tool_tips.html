@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Arial, sans-serif;
+            line-height: 1.8;
+            margin: 40px;
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+        }
+        .subtitle {
+            color: #555;
+            font-style: italic;
+            margin-top: 0;
+            margin-bottom: 35px;
+            font-size: 0.95em;
+        }
+        h2 {
+            border-bottom: 1px solid #7f8c8d;
+            padding-bottom: 6px;
+            margin-top: 45px;
+            font-size: 1.4em;
+        }
+        h3 {
+            margin-top: 30px;
+            font-size: 1.15em;
+            color: #34495e;
+        }
+        h4 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+            color: #34495e;
+        }
+        ul, ol {
+            margin-left: 25px;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            width: 100%;
+            font-size: 0.92em;
+            border: 1px solid #95a5a6;
+        }
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #bdc3c7;
+        }
+        th {
+            background-color: #ecf0f1;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border: 1px solid #d0d0d0;
+            border-left: 3px solid #34495e;
+            padding: 15px 20px;
+            margin: 18px 0;
+        }
+        .lang-section {
+            margin-bottom: 50px;
+        }
+        .lang-divider {
+            border-top: 2px dashed #bdc3c7;
+            margin: 50px 0;
+        }
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #bdc3c7;
+            font-size: 0.88em;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        .version {
+            text-align: right;
+            color: #7f8c8d;
+            font-size: 0.88em;
+            margin-bottom: 25px;
+        }
+        code {
+            background-color: #ecf0f1;
+            padding: 3px 7px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ENGLISH VERSION -->
+<div class="lang-section">
+<h1>User Guide</h1>
+<p class="subtitle">Comprehensive Usage Instructions</p>
+<p class="version">Version 3.0 | January 2026</p>
+
+<h2>Overview</h2>
+
+<p>Ground Param is a 4-module program designed for analyzing geotechnical parameters from SPT (Standard Penetration Test) data:</p>
+
+<ol>
+    <li><b>Module 1: SPT Plot</b> - SPT data input and visualization</li>
+    <li><b>Module 2: Laboratory Result Input</b> - Laboratory test data integration</li>
+    <li><b>Module 3: Parameters Summary</b> - Calculation of geotechnical parameters</li>
+    <li><b>Module 4: Multi-Parameters Plot</b> - Multi-parameter comparison graphs</li>
+</ol>
+
+<h2>Module 1: SPT Plot</h2>
+
+<h3>Purpose</h3>
+<p>Module 1 allows users to input SPT N-values and visualize them alongside soil classification, groundwater level, and effective stress profiles.</p>
+
+<h3>Key Features</h3>
+
+<h4>1. Axis Settings Panel (Left Side)</h4>
+<ul>
+    <li><b>Depth Range:</b> Set minimum and maximum depth (meters)</li>
+    <li><b>N-value Range:</b> Set SPT N-value display range (0-100)</li>
+    <li><b>Graph Title:</b> Customize graph title</li>
+    <li><b>Label Size:</b> Adjust text size (8-20 pt)</li>
+</ul>
+
+<h4>2. Data Entry Table</h4>
+<p><b>Input Methods:</b></p>
+<ul>
+    <li><b>Direct Entry:</b> Click cell and type value</li>
+    <li><b>Paste from Excel:</b> Copy data → Select top-left cell → Ctrl+V</li>
+    <li><b>Enter Key Navigation:</b> Press Enter to move down to next row</li>
+</ul>
+
+<p><b>Columns:</b></p>
+<table>
+<tr><th>Column</th><th>Description</th><th>Example</th></tr>
+<tr><td>BH</td><td>Borehole name</td><td>BH-01</td></tr>
+<tr><td>Depth (m)</td><td>Sampling depth</td><td>1.5</td></tr>
+<tr><td>N-value</td><td>SPT blow count</td><td>15</td></tr>
+<tr><td>USCS</td><td>Soil classification</td><td>SM, CL, SW</td></tr>
+<tr><td>GL. (m)</td><td>Surface elevation</td><td>100.0</td></tr>
+<tr><td>WL. (m)</td><td>Groundwater table depth</td><td>-2.0</td></tr>
+</table>
+
+<h4>3. Functions</h4>
+<ul>
+    <li><b>Add Row:</b> Insert new data row at the end</li>
+    <li><b>Delete Row:</b> Remove selected rows</li>
+    <li><b>Clear All:</b> Delete all table data (confirmation required)</li>
+    <li><b>Send to Module 2:</b> Transfer data to Module 2 for lab data entry</li>
+    <li><b>Update Graph:</b> Refresh visualization with current data</li>
+</ul>
+
+<h4>4. Graph Display</h4>
+<p>The graph shows three panels:</p>
+<ul>
+    <li><b>Left Panel:</b> Depth vs Soil Classification (USCS symbols)</li>
+    <li><b>Right Panel:</b> Depth vs SPT N-value with groundwater level (blue dashed line)</li>
+</ul>
+
+<h2>Module 2: Laboratory Result Input</h2>
+
+<h3>Purpose</h3>
+<p>Module 2 allows entry of laboratory test results to supplement SPT data, providing more accurate parameters for analysis.</p>
+
+<h3>Key Features</h3>
+
+<h4>1. Data Synchronization</h4>
+<p>After clicking "Send to Module 2" in Module 1:</p>
+<ul>
+    <li>BH names and depths are automatically populated</li>
+    <li>USCS classifications are synchronized</li>
+    <li>Users only need to enter lab test results</li>
+</ul>
+
+<h4>2. Laboratory Parameters</h4>
+<table>
+<tr><th>Parameter</th><th>Description</th><th>Unit</th></tr>
+<tr><td>Su</td><td>Undrained shear strength (Clay)</td><td>kPa</td></tr>
+<tr><td>φ'</td><td>Effective friction angle (Sand)</td><td>degrees</td></tr>
+<tr><td>E</td><td>Young's modulus</td><td>MPa</td></tr>
+<tr><td>ν</td><td>Poisson's ratio</td><td>-</td></tr>
+</table>
+
+<h4>3. Functions</h4>
+<ul>
+    <li><b>Add Row:</b> Insert additional test results</li>
+    <li><b>Delete Row:</b> Remove selected data rows</li>
+    <li><b>Clear All:</b> Delete all laboratory data</li>
+    <li><b>Send to Module 3:</b> Transfer combined SPT and lab data for parameter calculation</li>
+</ul>
+
+<h3>Usage Notes</h3>
+<div class="info-box">
+<p><b>Important:</b></p>
+<ul style="margin: 5px 0;">
+    <li>Lab data is optional - if not available, Module 3 will use SPT correlations</li>
+    <li>Lab results override SPT correlations when both are available</li>
+    <li>Leave cells empty if parameter was not tested</li>
+</ul>
+</div>
+
+<h2>Module 3: Parameters Summary</h2>
+
+<h3>Purpose</h3>
+<p>Module 3 calculates all geotechnical parameters using SPT correlations and/or laboratory test results.</p>
+
+<h3>Key Features</h3>
+
+<h4>1. Calculation Settings</h4>
+<ul>
+    <li><b>Structure Type:</b> Select foundation type (affects K₀ calculation)</li>
+    <li><b>Surface Condition:</b> Choose surface roughness (affects interface friction)</li>
+    <li><b>Alpha Value:</b> Coefficient for Su calculation (0.06-0.12)</li>
+    <li><b>Beta Value:</b> Coefficient for E calculation in sand (5-15)</li>
+    <li><b>k Value:</b> Coefficient for E calculation in clay (200-500)</li>
+</ul>
+
+<h4>2. Parameters Calculated</h4>
+<table>
+<tr><th>Parameter</th><th>Description</th><th>Calculation Method</th></tr>
+<tr><td>σ'v</td><td>Vertical effective stress</td><td>σv - u</td></tr>
+<tr><td>CN</td><td>Overburden correction</td><td>√(100/σ'v)</td></tr>
+<tr><td>Ncor</td><td>Corrected N-value</td><td>CN × Nfield</td></tr>
+<tr><td>Su</td><td>Undrained shear strength</td><td>α × Ncor × Pa (or Lab)</td></tr>
+<tr><td>φ'</td><td>Friction angle</td><td>27.1+0.3Ncor-0.00054Ncor² (or Lab)</td></tr>
+<tr><td>E</td><td>Young's modulus</td><td>k×Su or β×Ncor×Pa (or Lab)</td></tr>
+<tr><td>ν</td><td>Poisson's ratio</td><td>Based on soil type (or Lab)</td></tr>
+<tr><td>K₀</td><td>At-rest earth pressure</td><td>1-sin(φ') or 0.95-sin(φ')</td></tr>
+<tr><td>Rint</td><td>Interface reduction</td><td>Based on surface type</td></tr>
+<tr><td>δ</td><td>Interface friction</td><td>Rint × φ'</td></tr>
+</table>
+
+<h4>3. Results Display</h4>
+<ul>
+    <li>Results shown in table format for all boreholes and depths</li>
+    <li>Parameters marked with * indicate laboratory test values (not calculated)</li>
+    <li>Borehole-specific settings can be customized per BH</li>
+</ul>
+
+<h4>4. Functions</h4>
+<ul>
+    <li><b>Calculate:</b> Compute all parameters with current settings</li>
+    <li><b>Send to Module 4:</b> Transfer results for visualization</li>
+    <li><b>Export Results:</b> Save calculations to file</li>
+</ul>
+
+<h2>Module 4: Multi-Parameters Plot</h2>
+
+<h3>Purpose</h3>
+<p>Module 4 creates comparison graphs showing multiple parameters across different boreholes.</p>
+
+<h3>Key Features</h3>
+
+<h4>1. Loading Data</h4>
+<ul>
+    <li>Click "Load Data from Module 3" to import calculated parameters</li>
+    <li>Select which boreholes to include in visualization</li>
+    <li>Data includes all parameters from Module 3</li>
+</ul>
+
+<h4>2. Parameter Selection</h4>
+<p>Select up to 8 parameters to display:</p>
+<ul>
+    <li>N-value, Ncor</li>
+    <li>USCS, γsat</li>
+    <li>σ'v, Su, φ'</li>
+    <li>E, ν, K₀, δ</li>
+</ul>
+
+<h4>3. Axis Customization</h4>
+<p>For each selected parameter, customize:</p>
+<ul>
+    <li><b>Min Value:</b> Minimum axis value</li>
+    <li><b>Max Value:</b> Maximum axis value</li>
+    <li><b>Grid:</b> Show/hide grid lines</li>
+    <li><b>Y-axis Mode:</b> Depth (downward) or Elevation (upward)</li>
+</ul>
+
+<h4>4. Reference Lines</h4>
+<p>Add vertical reference lines to any graph:</p>
+<table>
+<tr><th>Column</th><th>Description</th></tr>
+<tr><td>Graph</td><td>Select which parameter graph (1-8)</td></tr>
+<tr><td>Value</td><td>X-axis value for vertical line</td></tr>
+<tr><td>From (m)</td><td>Starting depth</td></tr>
+<tr><td>To (m)</td><td>Ending depth</td></tr>
+<tr><td>Color</td><td>Line color (hex code)</td></tr>
+<tr><td>Line Style</td><td>Solid, Dashed, Dotted, Dash-dot</td></tr>
+<tr><td>Width</td><td>Line thickness (1-5)</td></tr>
+<tr><td>Label</td><td>Optional text label</td></tr>
+</table>
+
+<p><b>Add Row:</b> Click "Add Row" button to insert new reference line</p>
+
+<h4>5. Functions</h4>
+<ul>
+    <li><b>Update Graph:</b> Refresh display with current settings</li>
+    <li><b>Export Graph:</b> Save as PNG image</li>
+    <li><b>Clear Lines:</b> Remove all reference lines</li>
+</ul>
+
+<h2>Save/Load Project System</h2>
+
+<h3>Saving Projects</h3>
+<ol>
+    <li>Click <b>File → Save Project</b> (Ctrl+S)</li>
+    <li>Choose location and filename (.json)</li>
+    <li>All data from Modules 1-4 is saved</li>
+</ol>
+
+<p><b>Saved Data Includes:</b></p>
+<ul>
+    <li>Module 1: SPT data, axis settings, graph configuration</li>
+    <li>Module 2: Laboratory test results</li>
+    <li>Module 3: Calculation settings, results, borehole-specific settings</li>
+    <li>Module 4: Selected parameters, axis limits, reference lines, plot configuration</li>
+</ul>
+
+<h3>Loading Projects</h3>
+<ol>
+    <li>Click <b>File → Open Project</b> (Ctrl+O)</li>
+    <li>Select saved .json file</li>
+    <li>All modules are populated with saved data</li>
+    <li>Graphs are automatically updated</li>
+</ol>
+
+<h2>Keyboard Shortcuts</h2>
+
+<table>
+<tr><th>Shortcut</th><th>Function</th></tr>
+<tr><td>Ctrl+N</td><td>New Project</td></tr>
+<tr><td>Ctrl+O</td><td>Open Project</td></tr>
+<tr><td>Ctrl+S</td><td>Save Project</td></tr>
+<tr><td>Ctrl+Shift+S</td><td>Save Project As</td></tr>
+<tr><td>Ctrl+T</td><td>Toggle Theme</td></tr>
+<tr><td>Enter</td><td>Navigate to next row in table</td></tr>
+<tr><td>Ctrl+V</td><td>Paste from clipboard</td></tr>
+</table>
+
+<h2>Workflow Example</h2>
+
+<div class="info-box">
+<p><b>Typical Analysis Workflow:</b></p>
+<ol style="margin: 10px 0;">
+    <li>Open Module 1 → Enter SPT data → Update Graph → Send to Module 2</li>
+    <li>In Module 2 → Enter lab data (if available) → Send to Module 3</li>
+    <li>In Module 3 → Set calculation parameters → Calculate → Review results → Send to Module 4</li>
+    <li>In Module 4 → Load data → Select parameters → Customize axes → Add reference lines → Update Graph</li>
+    <li>Save Project (Ctrl+S) for future reference</li>
+</ol>
+</div>
+
+<h2>Important Notes</h2>
+
+<ul>
+    <li>Always save your project regularly to prevent data loss</li>
+    <li>Module data flows sequentially: 1 → 2 → 3 → 4</li>
+    <li>Laboratory data in Module 2 overrides SPT correlations in Module 3</li>
+    <li>Reference lines in Module 4 display red value labels automatically</li>
+    <li>All calculations follow internationally recognized geotechnical correlations</li>
+    <li>Results should be verified by qualified geotechnical engineers</li>
+</ul>
+
+<footer>
+    <b>Ground Param v 1.1.0.0</b><br>
+    User Guide - English Version<br>
+    <i>For technical reference, see Help → References</i>
+</footer>
+</div>
+
+<!-- LANGUAGE DIVIDER -->
+<div class="lang-divider"></div>
+
+<!-- THAI VERSION -->
+<div class="lang-section">
+<h1>คู่มือการใช้งานโปรแกรม</h1>
+<p class="subtitle">คำแนะนำการใช้งานอย่างละเอียด</p>
+<p class="version">เวอร์ชัน 3.0 | มกราคม 2569</p>
+
+<h2>ภาพรวม</h2>
+
+<p>Ground Param เป็นโปรแกรม 4 โมดูล สำหรับวิเคราะห์พารามิเตอร์ทางปฐพีกลศาสตร์จากข้อมูล SPT:</p>
+
+<ol>
+    <li><b>Module 1: SPT Plot</b> - กรอกข้อมูล SPT และแสดงกราฟ</li>
+    <li><b>Module 2: Laboratory Result Input</b> - กรอกข้อมูลทดสอบในห้องปฏิบัติการ</li>
+    <li><b>Module 3: Parameters Summary</b> - คำนวณพารามิเตอร์ทางปฐพีกลศาสตร์</li>
+    <li><b>Module 4: Multi-Parameters Plot</b> - แสดงกราฟเปรียบเทียบหลายพารามิเตอร์</li>
+</ol>
+
+<h2>Module 1: SPT Plot</h2>
+
+<h3>วัตถุประสงค์</h3>
+<p>Module 1 ใช้สำหรับกรอกข้อมูล SPT N-value และแสดงกราฟร่วมกับการจำแนกดิน ระดับน้ำใต้ดิน และหน่วยแรงประสิทธิผล</p>
+
+<h3>ฟังก์ชันหลัก</h3>
+
+<h4>1. แผงตั้งค่ากราฟ (ด้านซ้าย)</h4>
+<ul>
+    <li><b>ช่วงความลึก:</b> กำหนดความลึกต่ำสุดและสูงสุด (เมตร)</li>
+    <li><b>ช่วง N-value:</b> กำหนดช่วงแสดงผล SPT N-value (0-100)</li>
+    <li><b>ชื่อกราฟ:</b> ปรับแต่งชื่อกราฟ</li>
+    <li><b>ขนาดตัวอักษร:</b> ปรับขนาดข้อความ (8-20 pt)</li>
+</ul>
+
+<h4>2. ตารางกรอกข้อมูล</h4>
+<p><b>วิธีการกรอกข้อมูล:</b></p>
+<ul>
+    <li><b>พิมพ์โดยตรง:</b> คลิกเซลล์และพิมพ์ข้อมูล</li>
+    <li><b>วางจาก Excel:</b> คัดลอกข้อมูล → เลือกเซลล์มุมซ้ายบน → Ctrl+V</li>
+    <li><b>กด Enter:</b> กด Enter เพื่อย้ายไปแถวถัดไป</li>
+</ul>
+
+<p><b>คอลัมน์:</b></p>
+<table>
+<tr><th>คอลัมน์</th><th>คำอธิบาย</th><th>ตัวอย่าง</th></tr>
+<tr><td>BH</td><td>ชื่อหลุมเจาะ</td><td>BH-01</td></tr>
+<tr><td>Depth (m)</td><td>ความลึกเก็บตัวอย่าง</td><td>1.5</td></tr>
+<tr><td>N-value</td><td>ค่า SPT</td><td>15</td></tr>
+<tr><td>USCS</td><td>การจำแนกดิน</td><td>SM, CL, SW</td></tr>
+<tr><td>GL. (m)</td><td>ระดับปากหลุม</td><td>100.0</td></tr>
+<tr><td>WL. (m)</td><td>ระดับน้ำใต้ดิน</td><td>-2.0</td></tr>
+</table>
+
+<h4>3. ฟังก์ชัน</h4>
+<ul>
+    <li><b>Add Row:</b> เพิ่มแถวใหม่ท้ายตาราง</li>
+    <li><b>Delete Row:</b> ลบแถวที่เลือก</li>
+    <li><b>Clear All:</b> ลบข้อมูลทั้งหมด (ต้องยืนยัน)</li>
+    <li><b>Send to Module 2:</b> ส่งข้อมูลไปยัง Module 2</li>
+    <li><b>Update Graph:</b> อัพเดตกราฟตามข้อมูลปัจจุบัน</li>
+</ul>
+
+<h4>4. การแสดงกราฟ</h4>
+<p>กราฟประกอบด้วย 3 แผง:</p>
+<ul>
+    <li><b>แผงซ้าย:</b> ความลึก vs การจำแนกดิน (สัญลักษณ์ USCS)</li>
+    <li><b>แผงขวา:</b> ความลึก vs SPT N-value พร้อมระดับน้ำใต้ดิน (เส้นประสีน้ำเงิน)</li>
+</ul>
+
+<h2>Module 2: Laboratory Result Input</h2>
+
+<h3>วัตถุประสงค์</h3>
+<p>Module 2 ใช้สำหรับกรอกผลการทดสอบในห้องปฏิบัติการเพื่อเสริมข้อมูล SPT ทำให้ได้พารามิเตอร์ที่แม่นยำยิ่งขึ้น</p>
+
+<h3>ฟังก์ชันหลัก</h3>
+
+<h4>1. การซิงค์ข้อมูล</h4>
+<p>หลังจากกด "Send to Module 2" ใน Module 1:</p>
+<ul>
+    <li>ชื่อหลุมเจาะและความลึกจะถูกนำเข้าอัตโนมัติ</li>
+    <li>การจำแนกดิน USCS จะถูกซิงค์</li>
+    <li>ผู้ใช้เพียงกรอกผลการทดสอบจากห้องแล็บ</li>
+</ul>
+
+<h4>2. พารามิเตอร์จากห้องปฏิบัติการ</h4>
+<table>
+<tr><th>พารามิเตอร์</th><th>คำอธิบาย</th><th>หน่วย</th></tr>
+<tr><td>Su</td><td>กำลังรับแรงเฉือนแบบไม่ระบายน้ำ (ดินเหนียว)</td><td>kPa</td></tr>
+<tr><td>φ'</td><td>มุมเสียดทานประสิทธิผล (ทราย)</td><td>องศา</td></tr>
+<tr><td>E</td><td>โมดูลัสของยัง</td><td>MPa</td></tr>
+<tr><td>ν</td><td>อัตราส่วนปัวซอง</td><td>-</td></tr>
+</table>
+
+<h4>3. ฟังก์ชัน</h4>
+<ul>
+    <li><b>Add Row:</b> เพิ่มแถวผลการทดสอบ</li>
+    <li><b>Delete Row:</b> ลบแถวที่เลือก</li>
+    <li><b>Clear All:</b> ลบข้อมูลห้องแล็บทั้งหมด</li>
+    <li><b>Send to Module 3:</b> ส่งข้อมูล SPT + Lab ไปคำนวณพารามิเตอร์</li>
+</ul>
+
+<h3>หมายเหตุการใช้งาน</h3>
+<div class="info-box">
+<p><b>สำคัญ:</b></p>
+<ul style="margin: 5px 0;">
+    <li>ข้อมูลห้องแล็บเป็นตัวเลือก - ถ้าไม่มี Module 3 จะใช้ SPT correlation</li>
+    <li>ผลห้องแล็บจะแทนที่ SPT correlation เมื่อมีข้อมูลทั้งสอง</li>
+    <li>ปล่อยช่องว่างถ้าไม่ได้ทดสอบพารามิเตอร์นั้น</li>
+</ul>
+</div>
+
+<h2>Module 3: Parameters Summary</h2>
+
+<h3>วัตถุประสงค์</h3>
+<p>Module 3 คำนวณพารามิเตอร์ทางปฐพีกลศาสตร์ทั้งหมดจาก SPT correlation และ/หรือผลการทดสอบห้องปฏิบัติการ</p>
+
+<h3>ฟังก์ชันหลัก</h3>
+
+<h4>1. ตั้งค่าการคำนวณ</h4>
+<ul>
+    <li><b>Structure Type:</b> เลือกประเภทฐานราก (ส่งผลต่อค่า K₀)</li>
+    <li><b>Surface Condition:</b> เลือกความขรุขระของผิว (ส่งผลต่อมุมเสียดทานระหว่างผิว)</li>
+    <li><b>Alpha Value:</b> ค่าสัมประสิทธิ์สำหรับคำนวณ Su (0.06-0.12)</li>
+    <li><b>Beta Value:</b> ค่าสัมประสิทธิ์สำหรับคำนวณ E ในทราย (5-15)</li>
+    <li><b>k Value:</b> ค่าสัมประสิทธิ์สำหรับคำนวณ E ในดินเหนียว (200-500)</li>
+</ul>
+
+<h4>2. พารามิเตอร์ที่คำนวณได้</h4>
+<table>
+<tr><th>พารามิเตอร์</th><th>คำอธิบาย</th><th>วิธีการคำนวณ</th></tr>
+<tr><td>σ'v</td><td>หน่วยแรงประสิทธิผลในแนวดิ่ง</td><td>σv - u</td></tr>
+<tr><td>CN</td><td>ค่าปรับแก้หน่วยแรงบรรทุก</td><td>√(100/σ'v)</td></tr>
+<tr><td>Ncor</td><td>ค่า N ที่ปรับแก้แล้ว</td><td>CN × Nfield</td></tr>
+<tr><td>Su</td><td>กำลังรับแรงเฉือนแบบไม่ระบายน้ำ</td><td>α × Ncor × Pa (หรือ Lab)</td></tr>
+<tr><td>φ'</td><td>มุมเสียดทานประสิทธิผล</td><td>27.1+0.3Ncor-0.00054Ncor² (หรือ Lab)</td></tr>
+<tr><td>E</td><td>โมดูลัสของยัง</td><td>k×Su หรือ β×Ncor×Pa (หรือ Lab)</td></tr>
+<tr><td>ν</td><td>อัตราส่วนปัวซอง</td><td>ตามประเภทดิน (หรือ Lab)</td></tr>
+<tr><td>K₀</td><td>ค่าสัมประสิทธิ์แรงดันดินขณะหยุดนิ่ง</td><td>1-sin(φ') หรือ 0.95-sin(φ')</td></tr>
+<tr><td>Rint</td><td>ค่าลดทอนระหว่างผิว</td><td>ตามประเภทพื้นผิว</td></tr>
+<tr><td>δ</td><td>มุมเสียดทานระหว่างผิว</td><td>Rint × φ'</td></tr>
+</table>
+
+<h4>3. การแสดงผล</h4>
+<ul>
+    <li>ผลลัพธ์แสดงในรูปแบบตารางสำหรับทุกหลุมเจาะและความลึก</li>
+    <li>พารามิเตอร์ที่มีเครื่องหมาย * คือค่าจากห้องปฏิบัติการ (ไม่ได้คำนวณ)</li>
+    <li>สามารถปรับแต่งการตั้งค่าเฉพาะหลุมเจาะได้</li>
+</ul>
+
+<h4>4. ฟังก์ชัน</h4>
+<ul>
+    <li><b>Calculate:</b> คำนวณพารามิเตอร์ทั้งหมด</li>
+    <li><b>Send to Module 4:</b> ส่งผลลัพธ์ไปแสดงกราฟ</li>
+    <li><b>Export Results:</b> บันทึกผลการคำนวณ</li>
+</ul>
+
+<h2>Module 4: Multi-Parameters Plot</h2>
+
+<h3>วัตถุประสงค์</h3>
+<p>Module 4 สร้างกราฟเปรียบเทียบหลายพารามิเตอร์ของหลุมเจาะต่างๆ</p>
+
+<h3>ฟังก์ชันหลัก</h3>
+
+<h4>1. โหลดข้อมูล</h4>
+<ul>
+    <li>คลิก "Load Data from Module 3" เพื่อนำเข้าพารามิเตอร์ที่คำนวณแล้ว</li>
+    <li>เลือกหลุมเจาะที่ต้องการแสดง</li>
+    <li>ข้อมูลรวมพารามิเตอร์ทั้งหมดจาก Module 3</li>
+</ul>
+
+<h4>2. เลือกพารามิเตอร์</h4>
+<p>เลือกพารามิเตอร์ได้สูงสุด 8 ตัว:</p>
+<ul>
+    <li>N-value, Ncor</li>
+    <li>USCS, γsat</li>
+    <li>σ'v, Su, φ'</li>
+    <li>E, ν, K₀, δ</li>
+</ul>
+
+<h4>3. ปรับแต่งแกน</h4>
+<p>สำหรับแต่ละพารามิเตอร์ที่เลือก สามารถปรับแต่ง:</p>
+<ul>
+    <li><b>Min Value:</b> ค่าต่ำสุดของแกน</li>
+    <li><b>Max Value:</b> ค่าสูงสุดของแกน</li>
+    <li><b>Grid:</b> แสดง/ซ่อนเส้นตาราง</li>
+    <li><b>Y-axis Mode:</b> ความลึก (ลงล่าง) หรือ ระดับ (ขึ้นบน)</li>
+</ul>
+
+<h4>4. เส้นอ้างอิง</h4>
+<p>เพิ่มเส้นแนวตั้งอ้างอิงในกราฟใดก็ได้:</p>
+<table>
+<tr><th>คอลัมน์</th><th>คำอธิบาย</th></tr>
+<tr><td>Graph</td><td>เลือกกราฟพารามิเตอร์ (1-8)</td></tr>
+<tr><td>Value</td><td>ค่าบนแกน X สำหรับเส้นแนวตั้ง</td></tr>
+<tr><td>From (m)</td><td>ความลึกเริ่มต้น</td></tr>
+<tr><td>To (m)</td><td>ความลึกสิ้นสุด</td></tr>
+<tr><td>Color</td><td>สีเส้น (รหัสสี hex)</td></tr>
+<tr><td>Line Style</td><td>Solid, Dashed, Dotted, Dash-dot</td></tr>
+<tr><td>Width</td><td>ความหนาเส้น (1-5)</td></tr>
+<tr><td>Label</td><td>ป้ายข้อความ (ไม่บังคับ)</td></tr>
+</table>
+
+<p><b>Add Row:</b> คลิกปุ่ม "Add Row" เพื่อเพิ่มเส้นอ้างอิงใหม่</p>
+
+<h4>5. ฟังก์ชัน</h4>
+<ul>
+    <li><b>Update Graph:</b> อัพเดตกราฟตามการตั้งค่าปัจจุบัน</li>
+    <li><b>Export Graph:</b> บันทึกเป็นรูป PNG</li>
+    <li><b>Clear Lines:</b> ลบเส้นอ้างอิงทั้งหมด</li>
+</ul>
+
+<h2>ระบบบันทึก/เปิดโปรเจค</h2>
+
+<h3>การบันทึกโปรเจค</h3>
+<ol>
+    <li>คลิก <b>File → Save Project</b> (Ctrl+S)</li>
+    <li>เลือกตำแหน่งและชื่อไฟล์ (.json)</li>
+    <li>ข้อมูลทั้งหมดจาก Module 1-4 จะถูกบันทึก</li>
+</ol>
+
+<p><b>ข้อมูลที่บันทึก:</b></p>
+<ul>
+    <li>Module 1: ข้อมูล SPT, การตั้งค่ากราฟ, การตั้งค่าแกน</li>
+    <li>Module 2: ผลการทดสอบจากห้องปฏิบัติการ</li>
+    <li>Module 3: การตั้งค่าการคำนวณ, ผลลัพธ์, การตั้งค่าเฉพาะหลุมเจาะ</li>
+    <li>Module 4: พารามิเตอร์ที่เลือก, ขอบเขตแกน, เส้นอ้างอิง, การตั้งค่ากราฟ</li>
+</ul>
+
+<h3>การเปิดโปรเจค</h3>
+<ol>
+    <li>คลิก <b>File → Open Project</b> (Ctrl+O)</li>
+    <li>เลือกไฟล์ .json ที่บันทึกไว้</li>
+    <li>โมดูลทั้งหมดจะถูกเติมข้อมูลที่บันทึกไว้</li>
+    <li>กราฟจะอัพเดตอัตโนมัติ</li>
+</ol>
+
+<h2>แป้นพิมพ์ลัด</h2>
+
+<table>
+<tr><th>แป้นพิมพ์</th><th>ฟังก์ชัน</th></tr>
+<tr><td>Ctrl+N</td><td>โปรเจคใหม่</td></tr>
+<tr><td>Ctrl+O</td><td>เปิดโปรเจค</td></tr>
+<tr><td>Ctrl+S</td><td>บันทึกโปรเจค</td></tr>
+<tr><td>Ctrl+Shift+S</td><td>บันทึกเป็น</td></tr>
+<tr><td>Ctrl+T</td><td>เปลี่ยนธีม</td></tr>
+<tr><td>Enter</td><td>ย้ายไปแถวถัดไปในตาราง</td></tr>
+<tr><td>Ctrl+V</td><td>วางจากคลิปบอร์ด</td></tr>
+</table>
+
+<h2>ตัวอย่างขั้นตอนการทำงาน</h2>
+
+<div class="info-box">
+<p><b>ขั้นตอนการวิเคราะห์ทั่วไป:</b></p>
+<ol style="margin: 10px 0;">
+    <li>เปิด Module 1 → กรอกข้อมูล SPT → อัพเดตกราฟ → ส่งไป Module 2</li>
+    <li>ใน Module 2 → กรอกข้อมูลห้องแล็บ (ถ้ามี) → ส่งไป Module 3</li>
+    <li>ใน Module 3 → ตั้งค่าการคำนวณ → คำนวณ → ตรวจสอบผล → ส่งไป Module 4</li>
+    <li>ใน Module 4 → โหลดข้อมูล → เลือกพารามิเตอร์ → ปรับแต่งแกน → เพิ่มเส้นอ้างอิง → อัพเดตกราฟ</li>
+    <li>บันทึกโปรเจค (Ctrl+S) เพื่ออ้างอิงในอนาคต</li>
+</ol>
+</div>
+
+<h2>ข้อควรทราบ</h2>
+
+<ul>
+    <li>บันทึกโปรเจคเป็นประจำเพื่อป้องกันข้อมูลสูญหาย</li>
+    <li>ข้อมูลไหลแบบต่อเนื่อง: Module 1 → 2 → 3 → 4</li>
+    <li>ข้อมูลห้องแล็บใน Module 2 จะแทนที่ SPT correlation ใน Module 3</li>
+    <li>เส้นอ้างอิงใน Module 4 จะแสดงค่าเป็นป้ายสีแดงอัตโนมัติ</li>
+    <li>การคำนวณทั้งหมดอิงตาม correlation ทางปฐพีกลศาสตร์ที่ได้รับการยอมรับในระดับสากล</li>
+    <li>ผลลัพธ์ควรได้รับการตรวจสอบโดยวิศวกรปฐพีกลศาสตร์ที่มีคุณสมบัติ</li>
+</ul>
+
+<footer>
+    <b>Ground Param v 1.1.0.0</b><br>
+    คู่มือการใช้งาน - ฉบับภาษาไทย<br>
+    <i>สำหรับข้อมูลทางเทคนิค ดูที่ Help → References</i>
+</footer>
+</div>
+
+</body>
+</html>

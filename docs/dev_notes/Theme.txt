@@ -1,0 +1,38 @@
+Apple-style desktop application UI,
+soft modern design, clean minimal layout,
+macOS inspired interface,
+light gray background, white cards,
+subtle shadows, rounded corners,
+SF Pro typography,
+data-focused professional UI,
+engineering dashboard,
+calm and premium feeling,
+high information density but visually clean
+
+Base Colors
+
+Background:
+
+#F5F5F7 (Light)
+
+#1C1C1E (Dark – macOS style)
+
+Surface / Card:
+
+#FFFFFF / #2C2C2E
+
+Accent (ใช้เฉพาะจุดสำคัญ)
+
+Primary Accent: #007AFF (Apple Blue)
+
+Success: #34C759
+
+Warning: #FF9F0A
+
+Error: #FF3B30
+
+Style: Soft Modern · Clean · Premium · Data-focused
+
+Mood: Calm, Trust, Professional, Confident
+
+Philosophy: Less UI, More Content

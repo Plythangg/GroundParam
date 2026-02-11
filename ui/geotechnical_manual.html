@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>References - Technical Manual</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Arial, sans-serif;
+            line-height: 1.8;
+            margin: 40px;
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+        }
+        .subtitle {
+            color: #555;
+            font-style: italic;
+            margin-top: 0;
+            margin-bottom: 35px;
+            font-size: 0.95em;
+        }
+        h2 {
+            border-bottom: 1px solid #7f8c8d;
+            padding-bottom: 6px;
+            margin-top: 45px;
+            font-size: 1.4em;
+        }
+        h3 {
+            margin-top: 30px;
+            font-size: 1.15em;
+            color: #34495e;
+        }
+        h4 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+            color: #34495e;
+        }
+        ul {
+            margin-left: 25px;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            width: 100%;
+            font-size: 0.92em;
+            border: 1px solid #95a5a6;
+        }
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #bdc3c7;
+        }
+        th {
+            background-color: #ecf0f1;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .equation-box {
+            background-color: #f8f9fa;
+            border: 1px solid #d0d0d0;
+            border-left: 3px solid #2c3e50;
+            padding: 15px 20px;
+            margin: 18px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .lang-section {
+            margin-bottom: 50px;
+        }
+        .lang-divider {
+            border-top: 2px dashed #bdc3c7;
+            margin: 50px 0;
+        }
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #bdc3c7;
+            font-size: 0.88em;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        .version {
+            text-align: right;
+            color: #7f8c8d;
+            font-size: 0.88em;
+            margin-bottom: 25px;
+        }
+        .side-by-side {
+            display: flex;
+            gap: 25px;
+            margin: 25px 0;
+        }
+        .side-by-side > div {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ENGLISH VERSION -->
+<div class="lang-section">
+<h1>References</h1>
+<p class="subtitle">Technical Manual for SPT-Based Correlations</p>
+<p class="version">Version 3.0 | January 2026</p>
+
+<h2>1. Soil Classification Systems</h2>
+
+<h3>1.1 Unified Soil Classification System (USCS)</h3>
+
+<table>
+<tr><th>Group Symbol</th><th>Soil Type</th><th>Description</th></tr>
+<tr><td>GW</td><td>Gravel</td><td>Well-graded gravel, gravel-sand mixtures</td></tr>
+<tr><td>GP</td><td>Gravel</td><td>Poorly-graded gravel, gravel-sand mixtures</td></tr>
+<tr><td>GM</td><td>Gravel</td><td>Silty gravel, gravel-sand-silt mixtures</td></tr>
+<tr><td>GC</td><td>Gravel</td><td>Clayey gravel, gravel-sand-clay mixtures</td></tr>
+<tr><td>SW</td><td>Sand</td><td>Well-graded sand, gravelly sand</td></tr>
+<tr><td>SP</td><td>Sand</td><td>Poorly-graded sand, gravelly sand</td></tr>
+<tr><td>SM</td><td>Sand</td><td>Silty sand, sand-silt mixtures</td></tr>
+<tr><td>SC</td><td>Sand</td><td>Clayey sand, sand-clay mixtures</td></tr>
+<tr><td>ML</td><td>Silt</td><td>Inorganic silt, sandy silt, clayey silt</td></tr>
+<tr><td>CL</td><td>Clay</td><td>Inorganic clay of low to medium plasticity</td></tr>
+<tr><td>OL</td><td>Organic</td><td>Organic silt, organic clay</td></tr>
+<tr><td>MH</td><td>Silt</td><td>Inorganic silt, micaceous or diatomaceous fine sand or silt</td></tr>
+<tr><td>CH</td><td>Clay</td><td>Inorganic clay of high plasticity</td></tr>
+<tr><td>OH</td><td>Organic</td><td>Organic clay of medium to high plasticity, organic silt</td></tr>
+<tr><td>PT</td><td>Peat</td><td>Peat, highly organic soils</td></tr>
+</table>
+
+<h3>1.2 Soil Consistency Classification</h3>
+
+<div class="side-by-side">
+    <div>
+        <h4>Clay Consistency</h4>
+        <table>
+        <tr><th>S<sub>u</sub> (kPa)</th><th>Consistency</th></tr>
+        <tr><td>&lt; 12.5</td><td>Very Soft</td></tr>
+        <tr><td>12.5 - 25</td><td>Soft</td></tr>
+        <tr><td>25 - 50</td><td>Medium</td></tr>
+        <tr><td>50 - 100</td><td>Stiff</td></tr>
+        <tr><td>100 - 200</td><td>Very Stiff</td></tr>
+        <tr><td>&gt; 200</td><td>Hard</td></tr>
+        </table>
+    </div>
+    <div>
+        <h4>Sand Consistency</h4>
+        <table>
+        <tr><th>SPT N-value (blows/ft)</th><th>Consistency</th></tr>
+        <tr><td>&lt; 4</td><td>Very Loose</td></tr>
+        <tr><td>4 - 10</td><td>Loose</td></tr>
+        <tr><td>10 - 30</td><td>Medium Dense</td></tr>
+        <tr><td>30 - 50</td><td>Dense</td></tr>
+        <tr><td>&gt; 50</td><td>Very Dense</td></tr>
+        </table>
+    </div>
+</div>
+
+<h2>2. Saturated Unit Weight (γ<sub>sat</sub>)</h2>
+
+<h3>2.1 Typical Values by Soil Type</h3>
+
+<table>
+<tr><th>Soil Classification</th><th>γ<sub>sat</sub> (kN/m³)</th></tr>
+<tr><td>GW, GP (Gravel)</td><td>20 - 22</td></tr>
+<tr><td>GM, GC (Silty/Clayey Gravel)</td><td>19 - 21</td></tr>
+<tr><td>SW, SP (Sand)</td><td>18 - 20</td></tr>
+<tr><td>SM, SC (Silty/Clayey Sand)</td><td>17 - 19</td></tr>
+<tr><td>ML (Silt)</td><td>16 - 18</td></tr>
+<tr><td>CL (Low Plasticity Clay)</td><td>16 - 19</td></tr>
+<tr><td>MH, CH (High Plasticity Silt/Clay)</td><td>15 - 18</td></tr>
+<tr><td>OL, OH (Organic Soil)</td><td>14 - 17</td></tr>
+<tr><td>PT (Peat)</td><td>10 - 14</td></tr>
+</table>
+
+<h2>3. Vertical Effective Stress (σ'<sub>v</sub>)</h2>
+
+<h3>3.1 Calculation Method</h3>
+
+<div class="equation-box">
+σ'<sub>v</sub> = σ<sub>v</sub> - u
+</div>
+
+<p>Where:</p>
+<ul>
+<li>σ'<sub>v</sub> = Vertical effective stress (kPa)</li>
+<li>σ<sub>v</sub> = Total vertical stress (kPa)</li>
+<li>u = Pore water pressure (kPa)</li>
+</ul>
+
+<h3>3.2 Total Stress Calculation</h3>
+
+<div class="equation-box">
+σ<sub>v</sub> = Σ (γ × Δz)
+</div>
+
+<p>For layered soil:</p>
+<ul>
+<li>Above GWT: σ<sub>v</sub> = Σ(γ<sub>moist</sub> × Δz)</li>
+<li>Below GWT: σ<sub>v</sub> = Σ(γ<sub>sat</sub> × Δz)</li>
+</ul>
+
+<h3>3.3 Pore Water Pressure</h3>
+
+<div class="equation-box">
+u = γ<sub>w</sub> × h<sub>w</sub>
+</div>
+
+<p>Where:</p>
+<ul>
+<li>γ<sub>w</sub> = Unit weight of water = 9.81 kN/m³</li>
+<li>h<sub>w</sub> = Height of water above the point (m)</li>
+</ul>
+
+<h2>4. SPT Corrections</h2>
+
+<h3>4.1 Overburden Correction (C<sub>N</sub>)</h3>
+
+<div class="equation-box">
+C<sub>N</sub> = √(100 / σ'<sub>v</sub>)
+</div>
+
+<p>Where σ'<sub>v</sub> is in kPa. Limitations:</p>
+<ul>
+<li>C<sub>N</sub> ≤ 2.0 (maximum value)</li>
+<li>Reference: Liao & Whitman (1986)</li>
+</ul>
+
+<h3>4.2 Corrected SPT N-value</h3>
+
+<p><b>For Sand (SW, SP, SM, SC):</b></p>
+<div class="equation-box">
+N<sub>cor</sub> = C<sub>N</sub> × N<sub>field</sub>
+</div>
+
+<p><b>For Clay (CL, ML, CH, MH):</b></p>
+<div class="equation-box">
+N<sub>cor</sub> = N<sub>field</sub> (no correction applied)
+</div>
+
+<h2>5. Strength Parameters</h2>
+
+<h3>5.1 Undrained Shear Strength (S<sub>u</sub>) - Clay Soils</h3>
+
+<div class="equation-box">
+S<sub>u</sub> = α × N<sub>cor</sub> × P<sub>a</sub>
+</div>
+
+<p>Where:</p>
+<ul>
+<li>α = Empirical coefficient (typically 0.06 - 0.12)</li>
+<li>P<sub>a</sub> = Atmospheric pressure = 101.3 kPa</li>
+<li>Reference: Stroud (1974)</li>
+</ul>
+
+<table>
+<tr><th>Clay Type</th><th>α Value</th></tr>
+<tr><td>Normally Consolidated Clay</td><td>0.06 - 0.08</td></tr>
+<tr><td>Lightly Overconsolidated Clay</td><td>0.08 - 0.10</td></tr>
+<tr><td>Heavily Overconsolidated Clay</td><td>0.10 - 0.12</td></tr>
+</table>
+
+<h3>5.2 Effective Friction Angle (φ') - Sand Soils</h3>
+
+<div class="equation-box">
+φ' = 27.1 + 0.3 × N<sub>cor</sub> - 0.00054 × N<sub>cor</sub>²
+</div>
+
+<p>Reference: Peck, Hanson & Thornburn (1974)</p>
+
+<p>Typical ranges:</p>
+<ul>
+<li>Loose Sand (N<sub>cor</sub> &lt; 10): φ' = 28° - 30°</li>
+<li>Medium Dense Sand (N<sub>cor</sub> = 10-30): φ' = 30° - 36°</li>
+<li>Dense Sand (N<sub>cor</sub> &gt; 30): φ' = 36° - 41°</li>
+</ul>
+
+<h2>6. Stiffness Properties</h2>
+
+<h3>6.1 Young's Modulus (E)</h3>
+
+<p><b>For Clay:</b></p>
+<div class="equation-box">
+E = k × S<sub>u</sub>
+</div>
+<p>Where k = 200 - 500 (typically 300 for preliminary design)</p>
+
+<p><b>For Sand:</b></p>
+<div class="equation-box">
+E = β × N<sub>cor</sub> × P<sub>a</sub>
+</div>
+<p>Where β = 5 - 15 (typically 10 for preliminary design)</p>
+
+<h3>6.2 Poisson's Ratio (ν)</h3>
+
+<table>
+<tr><th>Soil Type</th><th>Poisson's Ratio (ν)</th></tr>
+<tr><td>Clay (Undrained)</td><td>0.45 - 0.50</td></tr>
+<tr><td>Clay (Drained)</td><td>0.20 - 0.35</td></tr>
+<tr><td>Sand (Loose)</td><td>0.20 - 0.30</td></tr>
+<tr><td>Sand (Dense)</td><td>0.30 - 0.40</td></tr>
+<tr><td>Silt</td><td>0.30 - 0.35</td></tr>
+</table>
+
+<h2>7. Earth Pressure Coefficients</h2>
+
+<h3>7.1 At-Rest Earth Pressure (K<sub>0</sub>)</h3>
+
+<p><b>For Sand (Normally Consolidated):</b></p>
+<div class="equation-box">
+K<sub>0</sub> = 1 - sin(φ')
+</div>
+<p>Reference: Jaky (1944)</p>
+
+<p><b>For Clay:</b></p>
+<div class="equation-box">
+K<sub>0</sub> = 0.95 - sin(φ')
+</div>
+
+<h3>7.2 Interface Friction Angle (δ)</h3>
+
+<div class="equation-box">
+δ = R<sub>int</sub> × φ'
+</div>
+
+<p>Where R<sub>int</sub> is reduction factor:</p>
+<table>
+<tr><th>Surface Type</th><th>R<sub>int</sub></th></tr>
+<tr><td>Rough Concrete (cast against soil)</td><td>1.0</td></tr>
+<tr><td>Smooth Concrete</td><td>0.8 - 0.9</td></tr>
+<tr><td>Steel Sheet Pile</td><td>0.5 - 0.7</td></tr>
+<tr><td>Smooth Steel</td><td>0.4 - 0.6</td></tr>
+</table>
+
+<h2>8. Important Notes</h2>
+
+<ul>
+<li>All correlations are empirical and should be used with engineering judgment</li>
+<li>SPT N-values should be from reliable field testing procedures</li>
+<li>Laboratory test results are recommended for critical projects</li>
+<li>Local experience and geological conditions should be considered</li>
+<li>Values are for preliminary design only; detailed analysis required for final design</li>
+</ul>
+
+<footer>
+    <b>Ground Param v 1.1.0.0</b><br>
+    References - English Version<br>
+    <i>Based on internationally recognized geotechnical engineering principles</i>
+</footer>
+</div>
+
+<!-- LANGUAGE DIVIDER -->
+<div class="lang-divider"></div>
+
+<!-- THAI VERSION -->
+<div class="lang-section">
+<h1>เอกสารอ้างอิง</h1>
+<p class="subtitle">คู่มือทางเทคนิคสำหรับการคำนวณจากค่า SPT</p>
+<p class="version">เวอร์ชัน 3.0 | มกราคม 2569</p>
+
+<h2>1. ระบบการจำแนกประเภทดิน</h2>
+
+<h3>1.1 ระบบ Unified Soil Classification System (USCS)</h3>
+
+<table>
+<tr><th>สัญลักษณ์</th><th>ประเภทดิน</th><th>คำอธิบาย</th></tr>
+<tr><td>GW</td><td>กรวด</td><td>กรวดที่มีการกระจายขนาดดี กรวดผสมทราย</td></tr>
+<tr><td>GP</td><td>กรวด</td><td>กรวดที่มีการกระจายขนาดไม่ดี กรวดผสมทราย</td></tr>
+<tr><td>GM</td><td>กรวด</td><td>กรวดผสมตะกอน กรวด-ทราย-ตะกอน</td></tr>
+<tr><td>GC</td><td>กรวด</td><td>กรวดผสมดินเหนียว กรวด-ทราย-ดินเหนียว</td></tr>
+<tr><td>SW</td><td>ทราย</td><td>ทรายที่มีการกระจายขนาดดี ทรายผสมกรวด</td></tr>
+<tr><td>SP</td><td>ทราย</td><td>ทรายที่มีการกระจายขนาดไม่ดี ทรายผสมกรวด</td></tr>
+<tr><td>SM</td><td>ทราย</td><td>ทรายผสมตะกอน ทราย-ตะกอน</td></tr>
+<tr><td>SC</td><td>ทราย</td><td>ทรายผสมดินเหนียว ทราย-ดินเหนียว</td></tr>
+<tr><td>ML</td><td>ตะกอน</td><td>ตะกอนอนินทรีย์ ตะกอนผสมทราย ตะกอนผสมดินเหนียว</td></tr>
+<tr><td>CL</td><td>ดินเหนียว</td><td>ดินเหนียวอนินทรีย์ความเหนียวต่ำถึงปานกลาง</td></tr>
+<tr><td>OL</td><td>อินทรีย์</td><td>ตะกอนอินทรีย์ ดินเหนียวอินทรีย์</td></tr>
+<tr><td>MH</td><td>ตะกอน</td><td>ตะกอนอนินทรีย์ ทรายละเอียดหรือตะกอนไมกา</td></tr>
+<tr><td>CH</td><td>ดินเหนียว</td><td>ดินเหนียวอนินทรีย์ความเหนียวสูง</td></tr>
+<tr><td>OH</td><td>อินทรีย์</td><td>ดินเหนียวอินทรีย์ความเหนียวปานกลางถึงสูง</td></tr>
+<tr><td>PT</td><td>พีท</td><td>พีท ดินอินทรีย์สูง</td></tr>
+</table>
+
+<h3>1.2 การจำแนกความแน่นของดิน</h3>
+
+<div class="side-by-side">
+    <div>
+        <h4>ความแน่นของดินเหนียว</h4>
+        <table>
+        <tr><th>S<sub>u</sub> (kPa)</th><th>ความแน่น</th></tr>
+        <tr><td>&lt; 12.5</td><td>อ่อนมาก (Very Soft)</td></tr>
+        <tr><td>12.5 - 25</td><td>อ่อน (Soft)</td></tr>
+        <tr><td>25 - 50</td><td>ปานกลาง (Medium)</td></tr>
+        <tr><td>50 - 100</td><td>แข็ง (Stiff)</td></tr>
+        <tr><td>100 - 200</td><td>แข็งมาก (Very Stiff)</td></tr>
+        <tr><td>&gt; 200</td><td>แข็งจัด (Hard)</td></tr>
+        </table>
+    </div>
+    <div>
+        <h4>ความแน่นของทราย</h4>
+        <table>
+        <tr><th>SPT N-value (ครั้ง/ฟุต)</th><th>ความแน่น</th></tr>
+        <tr><td>&lt; 4</td><td>หลวมมาก (Very Loose)</td></tr>
+        <tr><td>4 - 10</td><td>หลวม (Loose)</td></tr>
+        <tr><td>10 - 30</td><td>แน่นปานกลาง (Medium Dense)</td></tr>
+        <tr><td>30 - 50</td><td>แน่น (Dense)</td></tr>
+        <tr><td>&gt; 50</td><td>แน่นมาก (Very Dense)</td></tr>
+        </table>
+    </div>
+</div>
+
+<h2>2. น้ำหนักต่อหน่วยปริมาตรอิ่มตัว (γ<sub>sat</sub>)</h2>
+
+<h3>2.1 ค่าทั่วไปตามประเภทดิน</h3>
+
+<table>
+<tr><th>การจำแนกดิน</th><th>γ<sub>sat</sub> (kN/m³)</th></tr>
+<tr><td>GW, GP (กรวด)</td><td>20 - 22</td></tr>
+<tr><td>GM, GC (กรวดผสมตะกอน/ดินเหนียว)</td><td>19 - 21</td></tr>
+<tr><td>SW, SP (ทราย)</td><td>18 - 20</td></tr>
+<tr><td>SM, SC (ทรายผสมตะกอน/ดินเหนียว)</td><td>17 - 19</td></tr>
+<tr><td>ML (ตะกอน)</td><td>16 - 18</td></tr>
+<tr><td>CL (ดินเหนียวความเหนียวต่ำ)</td><td>16 - 19</td></tr>
+<tr><td>MH, CH (ตะกอน/ดินเหนียวความเหนียวสูง)</td><td>15 - 18</td></tr>
+<tr><td>OL, OH (ดินอินทรีย์)</td><td>14 - 17</td></tr>
+<tr><td>PT (พีท)</td><td>10 - 14</td></tr>
+</table>
+
+<h2>3. หน่วยแรงประสิทธิผลในแนวดิ่ง (σ'<sub>v</sub>)</h2>
+
+<h3>3.1 วิธีการคำนวณ</h3>
+
+<div class="equation-box">
+σ'<sub>v</sub> = σ<sub>v</sub> - u
+</div>
+
+<p>โดยที่:</p>
+<ul>
+<li>σ'<sub>v</sub> = หน่วยแรงประสิทธิผลในแนวดิ่ง (kPa)</li>
+<li>σ<sub>v</sub> = หน่วยแรงรวมในแนวดิ่ง (kPa)</li>
+<li>u = แรงดันน้ำรูพรุน (kPa)</li>
+</ul>
+
+<h3>3.2 การคำนวณหน่วยแรงรวม</h3>
+
+<div class="equation-box">
+σ<sub>v</sub> = Σ (γ × Δz)
+</div>
+
+<p>สำหรับดินหลายชั้น:</p>
+<ul>
+<li>เหนือระดับน้ำใต้ดิน: σ<sub>v</sub> = Σ(γ<sub>moist</sub> × Δz)</li>
+<li>ใต้ระดับน้ำใต้ดิน: σ<sub>v</sub> = Σ(γ<sub>sat</sub> × Δz)</li>
+</ul>
+
+<h3>3.3 แรงดันน้ำรูพรุน</h3>
+
+<div class="equation-box">
+u = γ<sub>w</sub> × h<sub>w</sub>
+</div>
+
+<p>โดยที่:</p>
+<ul>
+<li>γ<sub>w</sub> = น้ำหนักต่อหน่วยปริมาตรของน้ำ = 9.81 kN/m³</li>
+<li>h<sub>w</sub> = ความสูงของน้ำเหนือจุดที่พิจารณา (m)</li>
+</ul>
+
+<h2>4. การปรับแก้ค่า SPT</h2>
+
+<h3>4.1 การปรับแก้สำหรับหน่วยแรงบรรทุก (C<sub>N</sub>)</h3>
+
+<div class="equation-box">
+C<sub>N</sub> = √(100 / σ'<sub>v</sub>)
+</div>
+
+<p>โดยที่ σ'<sub>v</sub> มีหน่วยเป็น kPa ข้อจำกัด:</p>
+<ul>
+<li>C<sub>N</sub> ≤ 2.0 (ค่าสูงสุด)</li>
+<li>อ้างอิง: Liao & Whitman (1986)</li>
+</ul>
+
+<h3>4.2 ค่า SPT N-value ที่ปรับแก้แล้ว</h3>
+
+<p><b>สำหรับทราย (SW, SP, SM, SC):</b></p>
+<div class="equation-box">
+N<sub>cor</sub> = C<sub>N</sub> × N<sub>field</sub>
+</div>
+
+<p><b>สำหรับดินเหนียว (CL, ML, CH, MH):</b></p>
+<div class="equation-box">
+N<sub>cor</sub> = N<sub>field</sub> (ไม่ปรับแก้)
+</div>
+
+<h2>5. พารามิเตอร์กำลัง</h2>
+
+<h3>5.1 กำลังรับแรงเฉือนแบบไม่ระบายน้ำ (S<sub>u</sub>) - ดินเหนียว</h3>
+
+<div class="equation-box">
+S<sub>u</sub> = α × N<sub>cor</sub> × P<sub>a</sub>
+</div>
+
+<p>โดยที่:</p>
+<ul>
+<li>α = ค่าสัมประสิทธิ์เชิงประจักษ์ (โดยทั่วไป 0.06 - 0.12)</li>
+<li>P<sub>a</sub> = ความดันบรรยากาศ = 101.3 kPa</li>
+<li>อ้างอิง: Stroud (1974)</li>
+</ul>
+
+<table>
+<tr><th>ประเภทดินเหนียว</th><th>ค่า α</th></tr>
+<tr><td>ดินเหนียวบดอัดตามปกติ (Normally Consolidated)</td><td>0.06 - 0.08</td></tr>
+<tr><td>ดินเหนียวบดอัดเล็กน้อย (Lightly Overconsolidated)</td><td>0.08 - 0.10</td></tr>
+<tr><td>ดินเหนียวบดอัดมาก (Heavily Overconsolidated)</td><td>0.10 - 0.12</td></tr>
+</table>
+
+<h3>5.2 มุมเสียดทานประสิทธิผล (φ') - ทราย</h3>
+
+<div class="equation-box">
+φ' = 27.1 + 0.3 × N<sub>cor</sub> - 0.00054 × N<sub>cor</sub>²
+</div>
+
+<p>อ้างอิง: Peck, Hanson & Thornburn (1974)</p>
+
+<p>ช่วงค่าทั่วไป:</p>
+<ul>
+<li>ทรายหลวม (N<sub>cor</sub> &lt; 10): φ' = 28° - 30°</li>
+<li>ทรายแน่นปานกลาง (N<sub>cor</sub> = 10-30): φ' = 30° - 36°</li>
+<li>ทรายแน่น (N<sub>cor</sub> &gt; 30): φ' = 36° - 41°</li>
+</ul>
+
+<h2>6. คุณสมบัติด้านความแข็ง</h2>
+
+<h3>6.1 โมดูลัสของยัง (E)</h3>
+
+<p><b>สำหรับดินเหนียว:</b></p>
+<div class="equation-box">
+E = k × S<sub>u</sub>
+</div>
+<p>โดยที่ k = 200 - 500 (โดยทั่วไปใช้ 300 สำหรับการออกแบบเบื้องต้น)</p>
+
+<p><b>สำหรับทราย:</b></p>
+<div class="equation-box">
+E = β × N<sub>cor</sub> × P<sub>a</sub>
+</div>
+<p>โดยที่ β = 5 - 15 (โดยทั่วไปใช้ 10 สำหรับการออกแบบเบื้องต้น)</p>
+
+<h3>6.2 อัตราส่วนปัวซอง (ν)</h3>
+
+<table>
+<tr><th>ประเภทดิน</th><th>อัตราส่วนปัวซอง (ν)</th></tr>
+<tr><td>ดินเหนียว (ไม่ระบายน้ำ)</td><td>0.45 - 0.50</td></tr>
+<tr><td>ดินเหนียว (ระบายน้ำ)</td><td>0.20 - 0.35</td></tr>
+<tr><td>ทราย (หลวม)</td><td>0.20 - 0.30</td></tr>
+<tr><td>ทราย (แน่น)</td><td>0.30 - 0.40</td></tr>
+<tr><td>ตะกอน</td><td>0.30 - 0.35</td></tr>
+</table>
+
+<h2>7. ค่าสัมประสิทธิ์แรงดันดิน</h2>
+
+<h3>7.1 ค่าสัมประสิทธิ์แรงดันดินขณะหยุดนิ่ง (K<sub>0</sub>)</h3>
+
+<p><b>สำหรับทราย (บดอัดตามปกติ):</b></p>
+<div class="equation-box">
+K<sub>0</sub> = 1 - sin(φ')
+</div>
+<p>อ้างอิง: Jaky (1944)</p>
+
+<p><b>สำหรับดินเหนียว:</b></p>
+<div class="equation-box">
+K<sub>0</sub> = 0.95 - sin(φ')
+</div>
+
+<h3>7.2 มุมเสียดทานระหว่างผิว (δ)</h3>
+
+<div class="equation-box">
+δ = R<sub>int</sub> × φ'
+</div>
+
+<p>โดยที่ R<sub>int</sub> คือค่าสัมประสิทธิ์การลดทอน:</p>
+<table>
+<tr><th>ประเภทพื้นผิว</th><th>R<sub>int</sub></th></tr>
+<tr><td>คอนกรีตหยาบ (หล่อติดกับดิน)</td><td>1.0</td></tr>
+<tr><td>คอนกรีตเรียบ</td><td>0.8 - 0.9</td></tr>
+<tr><td>เหล็กแผ่นตอกหลัก</td><td>0.5 - 0.7</td></tr>
+<tr><td>เหล็กเรียบ</td><td>0.4 - 0.6</td></tr>
+</table>
+
+<h2>8. ข้อควรทราบ</h2>
+
+<ul>
+<li>สูตรคำนวณทั้งหมดเป็นค่าเชิงประจักษ์ ควรใช้ร่วมกับวิจารณญาณทางวิศวกรรม</li>
+<li>ค่า SPT N-value ต้องได้จากการทดสอบภาคสนามที่ถูกต้องและเชื่อถือได้</li>
+<li>โครงการสำคัญควรมีการทดสอบในห้องปฏิบัติการเพิ่มเติม</li>
+<li>ควรพิจารณาประสบการณ์ท้องถิ่นและสภาวะทางธรณีวิทยา</li>
+<li>ค่าที่ได้เหมาะสำหรับการออกแบบเบื้องต้นเท่านั้น การออกแบบขั้นสุดท้ายต้องมีการวิเคราะห์โดยละเอียด</li>
+</ul>
+
+<footer>
+    <b>Ground Param v 1.1.0.0</b><br>
+    เอกสารอ้างอิง - ฉบับภาษาไทย<br>
+    <i>อ้างอิงตามหลักวิศวกรรมปฐพีกลศาสตร์ที่ได้รับการยอมรับในระดับสากล</i>
+</footer>
+</div>
+
+</body>
+</html>
