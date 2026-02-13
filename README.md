@@ -98,7 +98,7 @@ GroundParam/
 
 ```
   Module 1 (SPT Data)          Module 2 (Lab Data)
-  ┌─────────────────┐          ┌─────────────────┐
+  ┌──────────────────┐          ┌──────────────────┐
   │ Borehole names   │          │ Su overrides     │
   │ SPT N-values     │          │ Phi overrides    │
   │ Depth intervals  │          │ Gamma overrides  │
@@ -116,7 +116,7 @@ GroundParam/
   │  • γsat from N-value                         │
   │  • σv' (effective stress, cumulative)        │
   │  • CN correction (Liao & Whitman / Terzaghi) │
-  │  • Su (Clay) or φ' (Sand)                   │
+  │  • Su (Clay) or φ' (Sand)                    │
   │  • E modulus, ν, K0, Rint                    │
   │                                              │
   │  Lab overrides replace calculated values     │
