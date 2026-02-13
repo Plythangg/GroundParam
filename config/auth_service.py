@@ -10,23 +10,30 @@ import time
 import ctypes
 import tempfile
 from typing import Tuple, Optional, Dict, Any
-from dotenv import load_dotenv
 from supabase import create_client, Client
 
 
-# Load .env from project root
-def _get_env_path():
-    try:
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_path, '.env')
+# Embedded credentials (used in built .exe — no .env file needed)
+_EMBEDDED_URL = "https://fghomhfkgvzolwktazdj.supabase.co"
+_EMBEDDED_KEY = (
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
+    "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnaG9taGZrZ3Z6b2x3a3RhemRqIiwi"
+    "cm9sZSI6ImFub24iLCJpYXQiOjE3Njk2OTI2NzgsImV4cCI6MjA4NTI2ODY3OH0."
+    "pCnHwhxLsnYVsvrAJQeC1r3IQZzBswKrLeijnWnONXA"
+)
 
+# Allow .env override for development (optional)
+try:
+    from dotenv import load_dotenv
+    _env_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    _env_path = os.path.join(_env_dir, '.env')
+    if os.path.exists(_env_path):
+        load_dotenv(_env_path)
+except ImportError:
+    pass
 
-load_dotenv(_get_env_path())
-
-SUPABASE_URL = os.getenv("SUPABASE_URL", "")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "") or _EMBEDDED_URL
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "") or _EMBEDDED_KEY
 
 # Session persistence file in temp directory
 _SESSION_FILE = os.path.join(tempfile.gettempdir(), ".groundparam_session")

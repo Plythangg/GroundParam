@@ -41,10 +41,13 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(script_dir)
 
-    png_file = os.path.join(project_root, "assets", "icons", "App_Logo.png")
-    ico_file = os.path.join(project_root, "assets", "icons", "App_Logo.ico")
+    icons_dir = os.path.join(project_root, "assets", "icons")
 
-    if os.path.exists(png_file):
-        convert_png_to_ico(png_file, ico_file)
-    else:
-        print(f"[ERROR] {png_file} not found!")
+    # Convert Program_Logo (used as exe icon)
+    for name in ["Program_Logo", "App_Logo"]:
+        png_file = os.path.join(icons_dir, f"{name}.png")
+        ico_file = os.path.join(icons_dir, f"{name}.ico")
+        if os.path.exists(png_file):
+            convert_png_to_ico(png_file, ico_file)
+        else:
+            print(f"[ERROR] {png_file} not found!")

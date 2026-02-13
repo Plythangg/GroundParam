@@ -1,7 +1,12 @@
 @echo off
 echo ========================================
-echo Building Geotech.exe
+echo Building GroundParam.exe
 echo ========================================
+echo.
+
+REM Move to project root
+cd /d "%~dp0\.."
+echo Working directory: %CD%
 echo.
 
 REM Activate virtual environment if exists
@@ -15,21 +20,30 @@ if exist .venv\Scripts\activate.bat (
 echo.
 echo Installing required packages...
 python -m pip install --upgrade pip
-pip install pyinstaller pillow reportlab
+pip install pyinstaller pillow
 
 echo.
 echo Converting PNG to ICO...
-python convert_icon.py
+python scripts\convert_icon.py
 
 echo.
-echo Building executable with PyInstaller...
-pyinstaller --clean Geotech.spec
+echo Building single executable with PyInstaller...
+pyinstaller --clean GroundParam.spec
 
 echo.
-echo ========================================
-echo Build complete!
-echo ========================================
-echo.
-echo Executable location: dist\Geotech.exe
+if exist "dist\GroundParam.exe" (
+    echo ========================================
+    echo Build SUCCESSFUL!
+    echo ========================================
+    echo.
+    echo Executable: dist\GroundParam.exe
+    echo.
+    echo NOTE: No .env file needed — credentials
+    echo       are embedded in the executable.
+) else (
+    echo ========================================
+    echo Build FAILED — check errors above
+    echo ========================================
+)
 echo.
 pause
