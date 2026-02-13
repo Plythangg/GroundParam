@@ -1061,6 +1061,88 @@ class Module1SPTPlot(QWidget):
 
         return canvas
 
+    def _plot_bh_on_axis(self, ax, bh_name, use_elevation):
+        """Plot a single borehole on the given axes (shared by screen and PDF export)"""
+        settings = self.bh_settings.get(bh_name, {'surface_elev': 100.0, 'water_level': 0.0})
+        surface_elev = settings['surface_elev']
+
+        spt_values = []
+        y_values = []
+        class_values = []
+        depth_indices = []
+
+        for idx, depth in enumerate(sorted(self.depths)):
+            data = self.borehole_data[bh_name].get(depth, {'spt': None, 'class': ''})
+            if data['spt'] is not None:
+                spt_values.append(data['spt'])
+                if use_elevation:
+                    y_values.append(surface_elev - depth)
+                else:
+                    y_values.append(depth)
+                class_values.append(data['class'])
+                depth_indices.append(idx)
+
+        if spt_values:
+            color = "#0004FF"
+            ax.scatter(spt_values, y_values, c=color, s=80, alpha=1.0, zorder=3)
+
+            for i in range(len(spt_values) - 1):
+                if depth_indices[i+1] - depth_indices[i] == 1:
+                    ax.plot([spt_values[i], spt_values[i+1]],
+                           [y_values[i], y_values[i+1]],
+                           c=color, alpha=1.0, linewidth=1.5, zorder=2)
+
+            for spt, y_val, cls in zip(spt_values, y_values, class_values):
+                label = f"N={int(spt)}"
+                if cls:
+                    label += f", {cls}"
+                ax.annotate(label, (spt, y_val), textcoords="offset points",
+                           xytext=(5, 0), ha='left', fontsize=self.label_size,
+                           color='#1C1C1E', alpha=0.8)
+
+        bh_settings = self.bh_settings.get(bh_name, {})
+        pile_top = bh_settings.get('pile_top', 100.0)
+        pile_tip = bh_settings.get('pile_tip', 85.0)
+        limits = self.axis_limits.get(bh_name, {'xmin': 0, 'xmax': 60, 'ymin': 100, 'ymax': 70})
+
+        if self.vline_checkbox.isChecked():
+            vline_x = self.vline_x_spin.value()
+            if limits['xmin'] <= vline_x <= limits['xmax']:
+                ax.axvline(x=vline_x, color='red', linewidth=1.0, linestyle='-',
+                          alpha=0.5, zorder=1)
+
+        if pile_top > pile_tip:
+            ax.axhline(y=pile_top, color="#0E7224", linewidth=1.5, linestyle='-',
+                      alpha=0.7, zorder=1, label=f'Pile Top ({pile_top:.1f}m)')
+            ax.axhline(y=pile_tip, color='#FF0000', linewidth=1.5, linestyle='-',
+                      alpha=0.7, zorder=1, label=f'Pile Tip ({pile_tip:.1f}m)')
+            pile_x_position = limits['xmin'] + (limits['xmax'] - limits['xmin']) * 0.5
+            ax.plot([pile_x_position, pile_x_position], [pile_top, pile_tip],
+                   color="#818181", linewidth=8, linestyle='-',
+                   alpha=0.6, zorder=1)
+            pile_length = pile_top - pile_tip
+            pile_mid_y = (pile_top + pile_tip) / 2
+            ax.text(pile_x_position, pile_mid_y, f'{pile_length:.1f}m',
+                   ha='center', va='center', fontsize=10, fontweight='bold',
+                   bbox=dict(boxstyle='round,pad=0.5', facecolor='white',
+                            edgecolor='black', linewidth=1.5),
+                   zorder=4)
+
+        if not use_elevation:
+            ax.invert_yaxis()
+
+        ax.set_xlabel('SPT N-value (blow/ft)', fontsize=11, fontweight='bold', color='black')
+        y_label = 'Elevation (m)' if use_elevation else 'Depth (m)'
+        ax.set_ylabel(y_label, fontsize=11, fontweight='bold', color='black')
+        title_text = f'{bh_name}\nSurface: {surface_elev:.2f} m'
+        ax.set_title(title_text, fontsize=13, fontweight='bold', pad=15, color='black')
+        ax.set_xlim(limits['xmin'], limits['xmax'])
+        ax.set_ylim(limits['ymax'], limits['ymin'])
+        ax.grid(True, alpha=0.3, color='#CCCCCC')
+
+        if pile_top > pile_tip:
+            ax.legend(loc='lower right', framealpha=0.9, fontsize=8)
+
     def _apply_plot_style(self):
         """Apply clean white background theme with dark text/borders"""
         plt.rcParams.update({
@@ -1223,30 +1305,28 @@ class Module1SPTPlot(QWidget):
             return
 
         try:
-            # First capture as PNG
-            pixmap = self.plot_widget.grab()
-
-            # Convert to PDF using matplotlib
             from matplotlib.backends.backend_pdf import PdfPages
-            import io
-            from PIL import Image
 
-            # Convert QPixmap to PIL Image
-            buffer = io.BytesIO()
-            pixmap.save(buffer, "PNG")
-            buffer.seek(0)
-            img = Image.open(buffer)
+            # Create a combined figure with all boreholes side by side
+            num_bh = len(self.bh_names)
+            if num_bh == 0:
+                QMessageBox.warning(self, "Warning", "No boreholes to export.")
+                return
 
-            # Create PDF
-            fig = Figure(figsize=(img.width/100, img.height/100), dpi=100)
-            ax = fig.add_subplot(111)
-            ax.imshow(img)
-            ax.axis('off')
-            fig.tight_layout(pad=0)
+            fig = Figure(figsize=(5 * num_bh, 6), dpi=150)
+            self._apply_plot_style()
+
+            y_axis_mode = self.y_axis_combo.currentText()
+            use_elevation = (y_axis_mode == "Elevation")
+
+            for idx, bh in enumerate(self.bh_names):
+                ax = fig.add_subplot(1, num_bh, idx + 1)
+                self._plot_bh_on_axis(ax, bh, use_elevation)
+
+            fig.tight_layout()
 
             with PdfPages(file_path) as pdf:
-                pdf.savefig(fig, dpi=300, bbox_inches='tight', pad_inches=0)
-                plt.close(fig)
+                pdf.savefig(fig, bbox_inches='tight')
 
             QMessageBox.information(
                 self, "Success",

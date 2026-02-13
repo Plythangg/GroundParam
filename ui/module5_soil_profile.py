@@ -631,10 +631,14 @@ class Module5SoilProfile(QWidget):
             self.bh_combo.addItem(bh_name)
             # Initialize empty data if doesn't exist
             if bh_name not in self.borehole_data:
-                # Try to migrate old index-based data
-                old_index = bh_names.index(bh_name)
-                if old_index in old_data:
-                    self.borehole_data[bh_name] = old_data[old_index]
+                if bh_name in old_data:
+                    # Restore name-based data (current format)
+                    self.borehole_data[bh_name] = old_data[bh_name]
+                else:
+                    # Try to migrate old integer-based data
+                    old_index = bh_names.index(bh_name)
+                    if old_index in old_data:
+                        self.borehole_data[bh_name] = old_data[old_index]
         self.bh_combo.blockSignals(False)
 
         # Load first borehole

@@ -1073,6 +1073,113 @@ class Module4MultiPlot(QWidget):
 
         return canvas
 
+    def _plot_soil_profile_on_axis(self, ax):
+        """Plot soil profile on a given axis (for PDF export)"""
+        layers = []
+        for row in range(self.line_table.rowCount()):
+            try:
+                from_item = self.line_table.item(row, 0)
+                to_item = self.line_table.item(row, 1)
+                soil_type_combo = self.line_table.cellWidget(row, 8)
+                consistency_item = self.line_table.item(row, 9)
+
+                if not from_item or not to_item or not from_item.text().strip() or not to_item.text().strip():
+                    continue
+
+                from_depth = float(from_item.text().strip())
+                to_depth = float(to_item.text().strip())
+                soil_type = soil_type_combo.currentText() if soil_type_combo else ""
+                consistency = consistency_item.text() if consistency_item else ""
+
+                if soil_type and consistency:
+                    layers.append({
+                        'from': from_depth, 'to': to_depth,
+                        'soil_type': soil_type, 'consistency': consistency
+                    })
+            except (ValueError, AttributeError):
+                continue
+
+        if not layers:
+            ax.text(0.5, 0.5, 'No data', ha='center', va='center', transform=ax.transAxes)
+            return
+
+        y_axis_mode = self.y_axis_combo.currentText()
+        use_elevation = (y_axis_mode == "Elevation")
+        soil_limits = self.axis_limits.get('soil', {'ymin': 100, 'ymax': 70})
+
+        for layer in layers:
+            y_start = layer['from']
+            y_end = layer['to']
+            ax.add_patch(plt.Rectangle((0, min(y_start, y_end)), 1, abs(y_start - y_end),
+                                       facecolor='white', edgecolor='black', linewidth=1))
+            self._draw_soil_pattern(ax, 0, 1, min(y_start, y_end), max(y_start, y_end),
+                                    layer['soil_type'], layer['consistency'])
+            mid_y = (y_start + y_end) / 2
+            ax.text(0.5, mid_y, f"{layer['consistency']}\n{layer['soil_type']}",
+                    ha='center', va='center', fontsize=8, fontweight='bold')
+
+        ax.set_xlim(0, 1)
+        ax.set_ylim(soil_limits['ymax'], soil_limits['ymin'])
+        ax.set_ylabel('Elevation (m)' if use_elevation else 'Depth (m)', fontsize=9, fontweight='bold')
+        ax.set_title('Soil Profile', fontsize=11, fontweight='bold', pad=15)
+        ax.set_xticks([])
+        ax.grid(True, alpha=0.7, axis='y')
+
+    def _plot_parameter_on_axis(self, ax, param_key, param_info):
+        """Plot a single parameter on a given axis (for PDF export)"""
+        y_axis_mode = self.y_axis_combo.currentText()
+        use_elevation = (y_axis_mode == "Elevation")
+        colors = ["#007BFF7B", "#5EC7348B", '#FF9F0A', "#FF3A308F", "#5856D68D", "#AF52DE90"]
+
+        for i, bh_name in enumerate(self.bh_names):
+            y_values = []
+            values = []
+            settings = self.bh_settings.get(bh_name, {'surface_elev': 100.0, 'water_level': 0.0})
+            surface_elev = settings['surface_elev']
+
+            for depth, data in sorted(self.plot_data[bh_name].items()):
+                value = data.get(param_key)
+                if value is not None:
+                    depth_float = float(depth) if isinstance(depth, str) else depth
+                    if use_elevation:
+                        y_values.append(surface_elev - depth_float)
+                    else:
+                        y_values.append(depth_float)
+                    values.append(value)
+
+            if y_values:
+                if bh_name in self.bh_display_settings:
+                    s = self.bh_display_settings[bh_name]
+                    color = s.get('color', colors[i % len(colors)])
+                    marker = s.get('symbol', 'o')
+                    size = s.get('size', 5) ** 2
+                else:
+                    color = colors[i % len(colors)]
+                    marker = 'o'
+                    size = 25
+
+                ax.scatter(values, y_values, c=color, s=size, alpha=1.0,
+                          label=bh_name, marker=marker, zorder=3)
+
+        self._plot_lines_on_axis(ax, param_key)
+
+        if not use_elevation:
+            ax.invert_yaxis()
+
+        label_text = f"{param_info['label']} {param_info['unit']}".strip()
+        ax.set_xlabel(label_text, fontsize=9, fontweight='bold')
+        ax.set_ylabel('Elevation (m)' if use_elevation else 'Depth (m)', fontsize=9, fontweight='bold')
+        title_suffix = 'Elevation' if use_elevation else 'Depth'
+        ax.set_title(f"{param_info['label']} vs {title_suffix}", fontsize=11, fontweight='bold', pad=15)
+
+        limits = self.axis_limits.get(param_key, {'xmin': 0, 'xmax': 100, 'ymin': 0, 'ymax': 30})
+        ax.set_xlim(limits['xmin'], limits['xmax'])
+        ax.set_ylim(limits['ymax'], limits['ymin'])
+        ax.grid(True, alpha=0.7)
+
+        if len(self.bh_names) > 1:
+            ax.legend(loc='best', framealpha=0.9, fontsize=9)
+
     def _apply_plot_style(self):
         """Apply Apple-style theme to matplotlib plots"""
         plt.rcParams.update({
@@ -1114,7 +1221,7 @@ class Module4MultiPlot(QWidget):
             QMessageBox.critical(self, "Error", f"Failed to export PNG: {str(e)}")
 
     def export_preview_pdf(self):
-        """Export preview window (all graphs) to PDF"""
+        """Export preview window (all graphs) to PDF - all plots on one page"""
         file_path, _ = QFileDialog.getSaveFileName(
             self, "Export Preview to PDF", "", "PDF Files (*.pdf)"
         )
@@ -1122,30 +1229,38 @@ class Module4MultiPlot(QWidget):
             return
 
         try:
-            # First capture as PNG
-            pixmap = self.plot_widget.grab()
-
-            # Convert to PDF using matplotlib
             from matplotlib.backends.backend_pdf import PdfPages
-            import io
-            from PIL import Image
 
-            # Convert QPixmap to PIL Image
-            buffer = io.BytesIO()
-            pixmap.save(buffer, "PNG")
-            buffer.seek(0)
-            img = Image.open(buffer)
+            # Count total plots
+            plots_to_draw = []
+            if self.soil_profile_checkbox.isChecked():
+                plots_to_draw.append(('soil_profile', None))
+            if self.plot_data:
+                for param_key, param_info in self.parameters.items():
+                    if param_info['enabled']:
+                        plots_to_draw.append(('parameter', (param_key, param_info)))
 
-            # Create PDF
-            fig = Figure(figsize=(img.width/100, img.height/100), dpi=100)
-            ax = fig.add_subplot(111)
-            ax.imshow(img)
-            ax.axis('off')
-            fig.tight_layout(pad=0)
+            num_plots = len(plots_to_draw)
+            if num_plots == 0:
+                QMessageBox.warning(self, "Warning", "No plots to export. Update plots first.")
+                return
+
+            # Create combined figure with all plots side by side
+            self._apply_plot_style()
+            fig = Figure(figsize=(4 * num_plots, 7), dpi=150)
+
+            for idx, (plot_type, plot_args) in enumerate(plots_to_draw):
+                ax = fig.add_subplot(1, num_plots, idx + 1)
+                if plot_type == 'soil_profile':
+                    self._plot_soil_profile_on_axis(ax)
+                else:
+                    param_key, param_info = plot_args
+                    self._plot_parameter_on_axis(ax, param_key, param_info)
+
+            fig.tight_layout()
 
             with PdfPages(file_path) as pdf:
-                pdf.savefig(fig, dpi=300, bbox_inches='tight', pad_inches=0)
-                plt.close(fig)
+                pdf.savefig(fig, bbox_inches='tight')
 
             QMessageBox.information(
                 self, "Success",

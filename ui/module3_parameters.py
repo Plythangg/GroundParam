@@ -858,7 +858,7 @@ class Module3Parameters(QWidget):
             return
 
         try:
-            with open(file_path, 'w', newline='', encoding='utf-8') as f:
+            with open(file_path, 'w', newline='', encoding='utf-8-sig') as f:
                 writer = csv.writer(f)
 
                 # Write data matching All Borehole table exactly
