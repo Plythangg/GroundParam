@@ -16,7 +16,8 @@ from PyQt6.QtWidgets import (
     QTableWidget, QTableWidgetItem, QHeaderView, QFileDialog,
     QMessageBox, QSplitter, QScrollArea, QComboBox, QLineEdit,
     QGroupBox, QTextEdit, QTreeWidget, QTreeWidgetItem,
-    QDialog, QListWidget, QDialogButtonBox, QAbstractItemView
+    QDialog, QListWidget, QDialogButtonBox, QAbstractItemView,
+    QTabWidget
 )
 from PyQt6.QtCore import Qt, QEvent
 from PyQt6.QtGui import QFont, QColor, QPen, QPainter
@@ -239,49 +240,81 @@ class Module6PlaxisScripts(QWidget):
         top_bar = self._create_top_bar()
         main_layout.addLayout(top_bar)
 
-        # Create vertical splitter: Tables on top, Preview on bottom
-        splitter = QSplitter(Qt.Orientation.Vertical)
+        # Sub-tab widget with 3 tabs
+        self.sub_tabs = QTabWidget()
+        self.sub_tabs.setFont(QFont("SF Pro Display", 10))
+        self.sub_tabs.setStyleSheet("""
+            QTabWidget::pane {
+                border: 1px solid #D1D1D6;
+                border-radius: 6px;
+                background: white;
+                top: -1px;
+            }
+            QTabBar::tab {
+                background: #F2F2F7;
+                border: 1px solid #D1D1D6;
+                border-bottom: none;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+                padding: 8px 24px;
+                margin-right: 2px;
+                font-size: 10pt;
+                color: #6E6E73;
+            }
+            QTabBar::tab:selected {
+                background: white;
+                color: #007AFF;
+                font-weight: bold;
+                border-bottom: 2px solid white;
+            }
+            QTabBar::tab:hover:!selected {
+                background: #E5E5EA;
+                color: #3C3C43;
+            }
+        """)
 
-        # Top side - Tables (full width)
-        top_widget = QWidget()
-        top_layout = QVBoxLayout(top_widget)
-        top_layout.setContentsMargins(0, 0, 0, 0)
-        top_layout.setSpacing(10)
+        # ── Tab 1: Borehole, Water Level, Soil Contour & Layer Properties ──
+        tab1_widget = QWidget()
+        tab1_layout = QVBoxLayout(tab1_widget)
+        tab1_layout.setContentsMargins(8, 12, 8, 8)
+        tab1_layout.setSpacing(12)
 
-        # Scroll area for tables
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll_content = QWidget()
-        scroll_layout = QVBoxLayout(scroll_content)
-        scroll_layout.setSpacing(15)
+        tab1_layout.addWidget(self._create_borehole_water_contour_section())
+        tab1_layout.addWidget(self._create_layer_table_section(), 1)
 
-        # 1. Borehole, Water Level & Soil Contour (horizontal layout)
-        scroll_layout.addWidget(self._create_borehole_water_contour_section())
+        self.sub_tabs.addTab(tab1_widget, "Borehole && Layer Properties")
 
-        # 2. Layer Properties Table
-        scroll_layout.addWidget(self._create_layer_table_section())
+        # ── Tab 2: Staged Construction ──
+        tab2_widget = QWidget()
+        tab2_layout = QVBoxLayout(tab2_widget)
+        tab2_layout.setContentsMargins(8, 12, 8, 8)
+        tab2_layout.setSpacing(12)
 
-        # 4. Staged Construction Table
-        scroll_layout.addWidget(self._create_staged_construction_section())
+        tab2_layout.addWidget(self._create_staged_construction_section(), 1)
 
-        scroll_layout.addStretch()
-        scroll.setWidget(scroll_content)
-        top_layout.addWidget(scroll)
+        self.sub_tabs.addTab(tab2_widget, "Staged Construction")
 
-        # Bottom side - Preview and Actions
-        bottom_widget = QWidget()
-        bottom_layout = QVBoxLayout(bottom_widget)
-        bottom_layout.setContentsMargins(0, 0, 0, 0)
+        # ── Tab 3: Python Script ──
+        tab3_widget = QWidget()
+        tab3_layout = QVBoxLayout(tab3_widget)
+        tab3_layout.setContentsMargins(8, 12, 8, 8)
+        tab3_layout.setSpacing(12)
 
-        # Preview section
-        bottom_layout.addWidget(self._create_preview_section())
+        tab3_layout.addWidget(self._create_preview_section(), 1)
 
-        # Add to splitter (tables top, preview bottom)
-        splitter.addWidget(top_widget)
-        splitter.addWidget(bottom_widget)
-        splitter.setSizes([500, 300])
+        self.sub_tabs.addTab(tab3_widget, "Python Script")
 
-        main_layout.addWidget(splitter)
+        # ── Tab 4: Output Script ──
+        tab4_widget = QWidget()
+        tab4_layout = QVBoxLayout(tab4_widget)
+        tab4_layout.setContentsMargins(8, 12, 8, 8)
+        tab4_layout.setSpacing(12)
+
+        tab4_layout.addWidget(self._create_output_script_section(), 1)
+
+        self.sub_tabs.addTab(tab4_widget, "Output Script")
+
+        main_layout.addWidget(self.sub_tabs)
         self.setLayout(main_layout)
 
     def _create_top_bar(self):
@@ -472,8 +505,7 @@ class Module6PlaxisScripts(QWidget):
         # Initialize table with dropdowns
         self._init_layer_table()
 
-        self.layer_table.setMinimumHeight(200)
-        layout.addWidget(self.layer_table)
+        layout.addWidget(self.layer_table, 1)
 
         # Buttons row
         btn_layout = QHBoxLayout()
@@ -766,8 +798,7 @@ class Module6PlaxisScripts(QWidget):
         # Initialize with sample data
         self._init_staged_tree()
 
-        self.staged_tree.setMinimumHeight(280)
-        layout.addWidget(self.staged_tree)
+        layout.addWidget(self.staged_tree, 1)
 
         # Add/Remove Row buttons
         btn_layout = QHBoxLayout()
@@ -1236,11 +1267,214 @@ class Module6PlaxisScripts(QWidget):
             idx = self.staged_tree.indexOfTopLevelItem(selected)
             self.staged_tree.takeTopLevelItem(idx)
 
+    # ── Output Script table ──────────────────────────────────────
+
+    # Material Type dropdown options for Output table
+    OUTPUT_MATERIAL_TYPES = [
+        'and interfaces',
+        'Discontinuities',
+        'Plates',
+        'Geogrids',
+        'Embedded beams',
+        'Cables',
+        'Anchors',
+    ]
+
+    # Column layout for the output table
+    # Group: Deformations(3) | TotalStrain(1) | Stresses(2) | Material(2) | Force(3) | Cal.Info(1) | PDF(1) | Scale(1)
+    OUTPUT_COLUMNS = [
+        'Phase',
+        '|u|', 'ux', 'uy',           # Deformations
+        'Total Strain (γₛ)',           # Total Strain
+        'Total stress', 'Effective Stress',  # Stresses
+        'Name', 'Type',                # Material
+        'M', 'Q', 'N',                # Force (kN)
+        'Cal. Information',            # Calculation Info
+        'PNG',                         # PNG
+        'Scale',                       # Scale
+    ]
+
+    # Columns that use checkboxes (by index)
+    OUTPUT_CHECK_COLS = {1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13}
+    # Columns that are text-editable: Phase(0), Name(7), Scale(14)
+    # Column that is dropdown: Type(8)
+
+    def _create_output_script_section(self):
+        """Create output script table with checkboxes for selecting PLAXIS output"""
+        container = QWidget()
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(8)
+
+        # Hint
+        hint = QLabel("Select output items per phase  |  Type column is a dropdown list")
+        hint.setFont(QFont("SF Pro Display", 9))
+        hint.setStyleSheet("color: #8E8E93;")
+        layout.addWidget(hint)
+
+        # Output Table
+        self.output_table = QTableWidget()
+        self.output_table.setColumnCount(len(self.OUTPUT_COLUMNS))
+        self.output_table.setFont(QFont("SF Pro Display", 9))
+        self.output_table.verticalHeader().setDefaultSectionSize(32)
+
+        # ── Multi-level header via QHeaderView label ──
+        self.output_table.setHorizontalHeaderLabels(self.OUTPUT_COLUMNS)
+        header = self.output_table.horizontalHeader()
+        header.setFont(QFont("SF Pro Display", 9, QFont.Weight.Bold))
+        header.setDefaultAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # Column widths
+        col_widths = [
+            110,        # Phase
+            40, 40, 40, # |u|, ux, uy
+            110,        # Total Strain
+            90, 110,    # Total stress, Effective Stress
+            180, 140,   # Name, Type
+            35, 35, 35, # M, Q, N
+            110,        # Cal. Information
+            40,         # PNG
+            90,         # Scale
+        ]
+        for col, w in enumerate(col_widths):
+            self.output_table.setColumnWidth(col, w)
+
+        # Table styling
+        self.output_table.setStyleSheet("""
+            QTableWidget::item:selected {
+                background-color: #E3F2FD;
+                color: black;
+            }
+            QTableWidget::item:focus {
+                background-color: #E3F2FD;
+                border: 1px solid #007AFF;
+            }
+            QComboBox {
+                background-color: transparent;
+                border: 1px solid #ccc;
+                padding: 2px 5px;
+            }
+            QComboBox:focus {
+                border: 1px solid #007AFF;
+            }
+            QComboBox::drop-down {
+                border: none;
+            }
+            QComboBox QAbstractItemView {
+                background-color: white;
+                selection-background-color: #E3F2FD;
+            }
+        """)
+
+        # Initialize with sample rows
+        sample_rows = [
+            {'phase': 'Loading', 'name': '"CapBeam"', 'type': 'Plates',
+             'checks': {9: True, 10: True}, 'scale': '1600x900'},
+            {'phase': 'Loading', 'name': '"Pile A 0.5x0.3@1"', 'type': 'Embedded beams',
+             'checks': {9: True, 10: True}, 'scale': '1600x900'},
+            {'phase': 'Loading', 'name': '"Pile B 0.4x0.3@1"', 'type': 'Embedded beams',
+             'checks': {9: True}, 'scale': '1600x900'},
+            {'phase': 'Loading', 'name': '"Pile D 0.26x0.26@1"', 'type': 'Embedded beams',
+             'checks': {9: True}, 'scale': '1600x900'},
+            {'phase': 'LWL_FS', 'name': '-', 'type': '',
+             'checks': {1: True, 4: True, 5: True}, 'scale': '1600x900'},
+            {'phase': 'RDD_FS', 'name': '-', 'type': '',
+             'checks': {1: True, 4: True, 5: True}, 'scale': '1600x900'},
+        ]
+
+        self.output_table.setRowCount(len(sample_rows))
+        for row, data in enumerate(sample_rows):
+            self._setup_output_row(row, data)
+
+        layout.addWidget(self.output_table, 1)
+
+        # Buttons row
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
+
+        add_btn = QPushButton("+ ROW")
+        add_btn.setFont(QFont("SF Pro Display", 10))
+        add_btn.clicked.connect(self._add_output_row)
+        btn_layout.addWidget(add_btn)
+
+        del_btn = QPushButton("- ROW")
+        del_btn.setFont(QFont("SF Pro Display", 10))
+        del_btn.clicked.connect(self._delete_output_row)
+        btn_layout.addWidget(del_btn)
+
+        layout.addLayout(btn_layout)
+
+        return container
+
+    def _setup_output_row(self, row, data=None):
+        """Setup a single row in the output table with checkboxes and dropdown"""
+        if data is None:
+            data = {'phase': '', 'name': '', 'type': '', 'checks': {}, 'scale': '1600x900'}
+
+        for col in range(len(self.OUTPUT_COLUMNS)):
+            if col in self.OUTPUT_CHECK_COLS:
+                # Checkbox column
+                item = QTableWidgetItem()
+                item.setFlags(
+                    Qt.ItemFlag.ItemIsUserCheckable
+                    | Qt.ItemFlag.ItemIsEnabled
+                    | Qt.ItemFlag.ItemIsSelectable
+                )
+                checked = data.get('checks', {}).get(col, False)
+                item.setCheckState(
+                    Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
+                )
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.output_table.setItem(row, col, item)
+
+            elif col == 0:  # Phase
+                item = QTableWidgetItem(data.get('phase', ''))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.output_table.setItem(row, col, item)
+
+            elif col == 7:  # Name
+                item = QTableWidgetItem(data.get('name', ''))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.output_table.setItem(row, col, item)
+
+            elif col == 8:  # Type (dropdown)
+                combo = QComboBox()
+                combo.addItem('')  # Empty option
+                combo.addItems(self.OUTPUT_MATERIAL_TYPES)
+                combo.setCurrentText(data.get('type', ''))
+                self._style_combobox(combo)
+                self.output_table.setCellWidget(row, col, combo)
+
+            elif col == 14:  # Scale
+                item = QTableWidgetItem(data.get('scale', '1600x900'))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.output_table.setItem(row, col, item)
+
+    def _add_output_row(self):
+        """Add new row to output table"""
+        row = self.output_table.rowCount()
+        self.output_table.insertRow(row)
+        self._setup_output_row(row)
+
+    def _delete_output_row(self):
+        """Delete selected row from output table"""
+        current = self.output_table.currentRow()
+        if current >= 0:
+            self.output_table.removeRow(current)
+        elif self.output_table.rowCount() > 0:
+            self.output_table.removeRow(self.output_table.rowCount() - 1)
+
     def _create_preview_section(self):
         """Create preview section for Python script"""
-        group = QGroupBox("Preview Python Scripts")
-        group.setFont(QFont("SF Pro Display", 11, QFont.Weight.Bold))
-        layout = QVBoxLayout()
+        container = QWidget()
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        # Hint label
+        hint = QLabel("Click 'Generate Script' to preview the PLAXIS Python script")
+        hint.setFont(QFont("SF Pro Display", 9))
+        hint.setStyleSheet("color: #8E8E93; margin-bottom: 4px;")
+        layout.addWidget(hint)
 
         # Preview text area
         self.preview_text = QTextEdit()
@@ -1251,16 +1485,14 @@ class Module6PlaxisScripts(QWidget):
                 background-color: #1e1e1e;
                 color: #d4d4d4;
                 border: 1px solid #333;
-                border-radius: 4px;
-                padding: 10px;
+                border-radius: 6px;
+                padding: 12px;
             }
         """)
         self.preview_text.setPlaceholderText("# Python script will be generated here...\n# Click 'Generate Script' in the top bar to preview")
-        self.preview_text.setMinimumHeight(150)
-        layout.addWidget(self.preview_text)
+        layout.addWidget(self.preview_text, 1)
 
-        group.setLayout(layout)
-        return group
+        return container
 
     def _load_from_module4(self):
         """Load layer data from Module 4"""
@@ -1832,6 +2064,25 @@ class Module6PlaxisScripts(QWidget):
                 phase['pore_pressure'], phase['reset_disp']
             ])
 
+        # Get output table data
+        output_data = []
+        for row in range(self.output_table.rowCount()):
+            row_dict = {
+                'phase': self.output_table.item(row, 0).text() if self.output_table.item(row, 0) else '',
+                'name': self.output_table.item(row, 7).text() if self.output_table.item(row, 7) else '',
+                'scale': self.output_table.item(row, 14).text() if self.output_table.item(row, 14) else '',
+                'checks': {},
+            }
+            # Type dropdown
+            type_combo = self.output_table.cellWidget(row, 8)
+            row_dict['type'] = type_combo.currentText() if type_combo else ''
+            # Checkboxes
+            for col in self.OUTPUT_CHECK_COLS:
+                item = self.output_table.item(row, col)
+                if item and item.checkState() == Qt.CheckState.Checked:
+                    row_dict['checks'][col] = True
+            output_data.append(row_dict)
+
         return {
             'borehole_position': self.position_input.text(),
             'lwl': self.lwl_input.text(),
@@ -1841,7 +2092,8 @@ class Module6PlaxisScripts(QWidget):
             'ymin': self.ymin_input.text(),
             'ymax': self.ymax_input.text(),
             'layer_data': layer_data,
-            'staged_data': staged_data
+            'staged_data': staged_data,
+            'output_data': output_data,
         }
 
     def load_project_data(self, data):
@@ -1871,6 +2123,19 @@ class Module6PlaxisScripts(QWidget):
             staged_data = data.get('staged_data', [])
             if staged_data:
                 self._build_tree_from_flat_data(staged_data)
+
+            # Load output table data
+            output_data = data.get('output_data', [])
+            if output_data:
+                self.output_table.setRowCount(len(output_data))
+                for row, row_dict in enumerate(output_data):
+                    # Convert string keys back to int for checks
+                    checks = {}
+                    for k, v in row_dict.get('checks', {}).items():
+                        checks[int(k)] = v
+                    row_dict_fixed = dict(row_dict)
+                    row_dict_fixed['checks'] = checks
+                    self._setup_output_row(row, row_dict_fixed)
 
         except Exception as e:
             print(f"Error loading Module 6 data: {e}")
