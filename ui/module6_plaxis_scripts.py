@@ -308,9 +308,35 @@ class Module6PlaxisScripts(QWidget):
         tab4_widget = QWidget()
         tab4_layout = QVBoxLayout(tab4_widget)
         tab4_layout.setContentsMargins(8, 12, 8, 8)
-        tab4_layout.setSpacing(12)
+        tab4_layout.setSpacing(8)
 
-        tab4_layout.addWidget(self._create_output_script_section(), 1)
+        # Buttons row for output script
+        out_btn_layout = QHBoxLayout()
+        out_btn_layout.addStretch()
+
+        btn_gen_out = QPushButton("Generate Output Script")
+        btn_gen_out.setToolTip("Generate Python script for PLAXIS Output")
+        btn_gen_out.setFont(QFont("SF Pro Display", 10))
+        btn_gen_out.setMaximumWidth(220)
+        btn_gen_out.clicked.connect(self._run_output_code)
+        out_btn_layout.addWidget(btn_gen_out)
+
+        btn_save_out = QPushButton("Save Output .py")
+        btn_save_out.setToolTip("Save output script to file")
+        btn_save_out.setFont(QFont("SF Pro Display", 10))
+        btn_save_out.setMaximumWidth(150)
+        btn_save_out.clicked.connect(self._save_output_script)
+        out_btn_layout.addWidget(btn_save_out)
+
+        tab4_layout.addLayout(out_btn_layout)
+
+        # Splitter: table top, preview bottom
+        out_splitter = QSplitter(Qt.Orientation.Vertical)
+        out_splitter.addWidget(self._create_output_script_section())
+        out_splitter.addWidget(self._create_output_preview_section())
+        out_splitter.setSizes([400, 300])
+
+        tab4_layout.addWidget(out_splitter, 1)
 
         self.sub_tabs.addTab(tab4_widget, "Output Script")
 
@@ -1307,7 +1333,7 @@ class Module6PlaxisScripts(QWidget):
         layout.setSpacing(8)
 
         # Hint
-        hint = QLabel("Select output items per phase  |  Type column is a dropdown list")
+        hint = QLabel("Name = PLAXIS element name (e.g. Plate_1, EmbeddedBeam_7)  |  ใส่ '-' สำหรับ Soil plot")
         hint.setFont(QFont("SF Pro Display", 9))
         hint.setStyleSheet("color: #8E8E93;")
         layout.addWidget(hint)
@@ -1367,14 +1393,16 @@ class Module6PlaxisScripts(QWidget):
         """)
 
         # Initialize with sample rows
+        # Name = PLAXIS element name (e.g. Plate_1, EmbeddedBeam_7)
+        # User finds these names from PLAXIS Output program
         sample_rows = [
-            {'phase': 'Loading', 'name': '"CapBeam"', 'type': 'Plates',
+            {'phase': 'Loading', 'name': 'Plate_1', 'type': 'Plates',
              'checks': {9: True, 10: True}, 'scale': '1600x900'},
-            {'phase': 'Loading', 'name': '"Pile A 0.5x0.3@1"', 'type': 'Embedded beams',
+            {'phase': 'Loading', 'name': 'EmbeddedBeam_6', 'type': 'Embedded beams',
              'checks': {9: True, 10: True}, 'scale': '1600x900'},
-            {'phase': 'Loading', 'name': '"Pile B 0.4x0.3@1"', 'type': 'Embedded beams',
+            {'phase': 'Loading', 'name': 'EmbeddedBeam_7', 'type': 'Embedded beams',
              'checks': {9: True}, 'scale': '1600x900'},
-            {'phase': 'Loading', 'name': '"Pile D 0.26x0.26@1"', 'type': 'Embedded beams',
+            {'phase': 'Loading', 'name': 'EmbeddedBeam_1', 'type': 'Embedded beams',
              'checks': {9: True}, 'scale': '1600x900'},
             {'phase': 'LWL_FS', 'name': '-', 'type': '',
              'checks': {1: True, 4: True, 5: True}, 'scale': '1600x900'},
@@ -1463,6 +1491,380 @@ class Module6PlaxisScripts(QWidget):
             self.output_table.removeRow(current)
         elif self.output_table.rowCount() > 0:
             self.output_table.removeRow(self.output_table.rowCount() - 1)
+
+    def _create_output_preview_section(self):
+        """Create preview area for the generated output script"""
+        container = QWidget()
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        hint = QLabel("Generated PLAXIS Output script preview")
+        hint.setFont(QFont("SF Pro Display", 9))
+        hint.setStyleSheet("color: #8E8E93; margin-bottom: 4px;")
+        layout.addWidget(hint)
+
+        self.output_preview_text = QTextEdit()
+        self.output_preview_text.setFont(QFont("Consolas", 10))
+        self.output_preview_text.setReadOnly(True)
+        self.output_preview_text.setStyleSheet("""
+            QTextEdit {
+                background-color: #1e1e1e;
+                color: #d4d4d4;
+                border: 1px solid #333;
+                border-radius: 6px;
+                padding: 12px;
+            }
+        """)
+        self.output_preview_text.setPlaceholderText(
+            "# Output script will be generated here...\n"
+            "# Click 'Generate Output Script' to preview")
+        layout.addWidget(self.output_preview_text, 1)
+
+        return container
+
+    def _run_output_code(self):
+        """Preview the generated output script"""
+        script = self._generate_output_script()
+        self.output_preview_text.setPlainText(script)
+
+    def _save_output_script(self):
+        """Save output script to file"""
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save Output Script",
+            "plaxis_output.py",
+            "Python Files (*.py);;All Files (*)")
+        if file_path:
+            script = self._generate_output_script()
+            try:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(script)
+                QMessageBox.information(self, "Success", f"Output script saved to:\n{file_path}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to save:\n{str(e)}")
+
+    # ── Output table data helpers ──────────────────────────────────
+
+    def _get_output_cell_value(self, row, col):
+        """Get value from output table cell (handles items and widgets)"""
+        widget = self.output_table.cellWidget(row, col)
+        if widget and isinstance(widget, QComboBox):
+            return widget.currentText()
+        item = self.output_table.item(row, col)
+        return item.text() if item else ""
+
+    def _is_output_checked(self, row, col):
+        """Check if a checkbox column is checked in output table"""
+        item = self.output_table.item(row, col)
+        if item:
+            return item.checkState() == Qt.CheckState.Checked
+        return False
+
+    def _collect_output_rows(self):
+        """Collect all output table rows as list of dicts"""
+        rows = []
+        for row in range(self.output_table.rowCount()):
+            phase = self._get_output_cell_value(row, 0).strip()
+            if not phase:
+                continue
+            rows.append({
+                'phase': phase,
+                'u_tot': self._is_output_checked(row, 1),
+                'ux': self._is_output_checked(row, 2),
+                'uy': self._is_output_checked(row, 3),
+                'total_strain': self._is_output_checked(row, 4),
+                'total_stress': self._is_output_checked(row, 5),
+                'effective_stress': self._is_output_checked(row, 6),
+                'name': self._get_output_cell_value(row, 7).strip(),
+                'type': self._get_output_cell_value(row, 8).strip(),
+                'M': self._is_output_checked(row, 9),
+                'Q': self._is_output_checked(row, 10),
+                'N': self._is_output_checked(row, 11),
+                'cal_info': self._is_output_checked(row, 12),
+                'pdf': self._is_output_checked(row, 13),
+                'scale': self._get_output_cell_value(row, 14).strip() or '1600x900',
+            })
+        return rows
+
+    # ── Generate Output Script ─────────────────────────────────────
+
+    # PLAXIS Output ResultType mapping
+    # Structure type → PLAXIS collection name and ResultTypes prefix
+    _STRUCT_MAP = {
+        'Plates':          ('Plates',         'Plate'),
+        'Embedded beams':  ('EmbeddedBeams',  'EmbeddedBeam'),
+        'Geogrids':        ('Geogrids',       'Geogrid'),
+        'Anchors':         ('Anchors',        'Anchor'),
+        'Cables':          ('Cables',         'Cable'),
+        'and interfaces':  ('Interfaces',     'Interface'),
+    }
+
+    # Force component → PLAXIS suffix
+    _FORCE_SUFFIX = {'M': 'M2D', 'Q': 'Q2D', 'N': 'N2D'}
+
+    # Soil deformation / stress → ResultTypes.Soil.*
+    _SOIL_RESULTS = {
+        'u_tot':            'Utot',
+        'ux':               'Ux',
+        'uy':               'Uy',
+        'total_strain':     'TotalDeviatoricStrain',
+        'total_stress':     'SigxxTotal',
+        'effective_stress': 'SigxxEffective',
+    }
+
+    # Friendly label for filenames
+    _SOIL_LABELS = {
+        'u_tot':            'Utot',
+        'ux':               'Ux',
+        'uy':               'Uy',
+        'total_strain':     'TotalStrain',
+        'total_stress':     'TotalStress',
+        'effective_stress': 'EffectiveStress',
+    }
+
+    def _generate_output_script(self):
+        """Generate PLAXIS Output Python script from the output table"""
+        rows = self._collect_output_rows()
+        if not rows:
+            return "# No output rows configured."
+
+        # Indent helper for try block
+        I = "    "  # 4-space indent inside try block
+
+        L = []  # script lines
+        a = L.append
+
+        # ─── Header ───
+        a("# ============================================================")
+        a("# PLAXIS Output Script")
+        a("# Generated by GeoTech v3.0")
+        a("# ============================================================")
+        a("")
+        a("from plxscripting.easy import *")
+        a("import os")
+        a("")
+        a("try:")
+
+        # ─── Connection ───
+        a(f"{I}# ------------------------------------------------------------")
+        a(f"{I}# 1. Connect to PLAXIS Output")
+        a(f"{I}# ------------------------------------------------------------")
+        a(f'{I}password = os.getenv("PLAXIS_PASSWORD")')
+        a(f'{I}s_o, g_o = new_server("localhost", 10001, password=password)')
+        a(f'{I}print(">>> Connected to PLAXIS Output")')
+        a("")
+
+        # ─── Setup ───
+        a(f"{I}# ------------------------------------------------------------")
+        a(f"{I}# 2. Setup")
+        a(f"{I}# ------------------------------------------------------------")
+        a(f'{I}output_dir = r"C:\\Users\\Public\\Documents\\PLAXIS_Exports"')
+        a(f"{I}os.makedirs(output_dir, exist_ok=True)")
+        a("")
+
+        # ─── Helper: export ───
+        a(f"{I}# ------------------------------------------------------------")
+        a(f"{I}# 3. Helper functions")
+        a(f"{I}# ------------------------------------------------------------")
+        a(f"{I}def export_png(plot, filename, img_w=1600, img_h=900):")
+        a(f'{I}    filepath = os.path.join(output_dir, f"{{filename}}.png")')
+        a(f"{I}    try:")
+        a(f"{I}        plot.export(filepath, img_w, img_h)")
+        a(f'{I}        print(f"  OK {{filename}}.png")')
+        a(f"{I}        return True")
+        a(f"{I}    except Exception as e:")
+        a(f'{I}        print(f"  FAIL {{filename}}: {{e}}")')
+        a(f"{I}        return False")
+        a("")
+
+        a(f"{I}def export_pdf(plot, filename, img_w=1600, img_h=900):")
+        a(f'{I}    filepath = os.path.join(output_dir, f"{{filename}}.pdf")')
+        a(f"{I}    try:")
+        a(f"{I}        plot.export(filepath, img_w, img_h)")
+        a(f'{I}        print(f"  OK {{filename}}.pdf")')
+        a(f"{I}        return True")
+        a(f"{I}    except Exception as e:")
+        a(f'{I}        print(f"  FAIL {{filename}}: {{e}}")')
+        a(f"{I}        return False")
+        a("")
+
+        # ─── Helper: find phase ───
+        a(f"{I}def find_phase(name):")
+        a(f'{I}    """Find phase by Identification (partial match)"""')
+        a(f"{I}    for p in g_o.Phases:")
+        a(f"{I}        if name in str(p.Identification):")
+        a(f"{I}            return p")
+        a(f"{I}    return None")
+        a("")
+
+        # ─── Helper: find structure elements by PLAXIS name ───
+        a(f"{I}def find_elements(name, collection):")
+        a(f'{I}    """Find elements whose Name contains the given name.')
+        a(f"{I}    e.g. name='EmbeddedBeam_6' matches 'EmbeddedBeam_6_1'")
+        a(f'{I}    """')
+        a(f"{I}    results = []")
+        a(f"{I}    for elem in collection:")
+        a(f"{I}        if name in str(elem.Name):")
+        a(f"{I}            results.append(elem)")
+        a(f"{I}    return results")
+        a("")
+
+        # ─── Collect unique phases ───
+        unique_phases = []
+        seen_phases = set()
+        for r in rows:
+            if r['phase'] not in seen_phases:
+                unique_phases.append(r['phase'])
+                seen_phases.add(r['phase'])
+
+        a(f"{I}# ------------------------------------------------------------")
+        a(f"{I}# 4. Get phases")
+        a(f"{I}# ------------------------------------------------------------")
+        for phase_name in unique_phases:
+            var = self._phase_var_name(phase_name)
+            a(f'{I}{var} = find_phase("{phase_name}")')
+            a(f'{I}print(f"Phase {phase_name}: {{{var}.Identification}}")')
+        a("")
+
+        # ─── Process each row ───
+        a(f"{I}# ============================================================")
+        a(f"{I}# 5. Generate output plots")
+        a(f"{I}# ============================================================")
+        a("")
+
+        current_phase = None
+        for r in rows:
+            phase_name = r['phase']
+            phase_var = self._phase_var_name(phase_name)
+            name_raw = r['name']
+            struct_type = r['type']
+            scale = r['scale']
+
+            # Parse scale (image size)
+            if 'x' in scale.lower():
+                parts = scale.lower().split('x')
+                img_w, img_h = parts[0].strip(), parts[1].strip()
+            else:
+                img_w, img_h = '1600', '900'
+
+            # Phase header
+            if phase_name != current_phase:
+                current_phase = phase_name
+                a(f"{I}# ══════════════════════════════════════════════════")
+                a(f"{I}# PHASE: {phase_name}")
+                a(f"{I}# ══════════════════════════════════════════════════")
+                a(f'{I}print("\\n" + "=" * 50)')
+                a(f'{I}print("PHASE: {phase_name}")')
+                a(f'{I}print("=" * 50)')
+                a("")
+
+            # ── Case A: Soil result (no material / Name is "-" or empty) ──
+            is_soil = (not name_raw or name_raw == '-' or not struct_type)
+            has_soil_checks = any(r[k] for k in [
+                'u_tot', 'ux', 'uy', 'total_strain',
+                'total_stress', 'effective_stress'])
+
+            if is_soil and has_soil_checks:
+                a(f'{I}print("\\n[Soil Results]")')
+                a(f"{I}try:")
+                a(f"{I}    soil_plot = g_o.Plots[0]")
+                a(f"{I}    soil_plot.Phase = {phase_var}")
+                a("")
+
+                for key, result_attr in self._SOIL_RESULTS.items():
+                    if r.get(key):
+                        label = self._SOIL_LABELS[key]
+                        fname = f"{phase_name}_{label}"
+                        a(f"{I}    soil_plot.ResultType = g_o.ResultTypes.Soil.{result_attr}")
+                        a(f'{I}    export_png(soil_plot, "{fname}", {img_w}, {img_h})')
+                        if r['pdf']:
+                            a(f'{I}    export_pdf(soil_plot, "{fname}", {img_w}, {img_h})')
+                        a("")
+
+                a(f"{I}except Exception as e:")
+                a(f'{I}    print(f"  FAIL: {{e}}")')
+                a("")
+
+            # ── Case B: Structural result (material specified) ──
+            has_force = r['M'] or r['Q'] or r['N']
+
+            if not is_soil and has_force and struct_type:
+                elem_name = name_raw.strip('"')
+                collection_name, rt_prefix = self._STRUCT_MAP.get(
+                    struct_type, ('Plates', 'Plate'))
+
+                a(f'{I}# --- {elem_name} ({struct_type}) ---')
+                a(f'{I}print("\\n[{elem_name} - {struct_type}]")')
+                a(f"{I}try:")
+                a(f'{I}    elems = find_elements("{elem_name}", g_o.{collection_name})')
+                a(f"{I}    if not elems:")
+                a(f'{I}        print("  WARNING: {elem_name} not found")')
+                a(f"{I}    for _i, _elem in enumerate(elems):")
+                a(f"{I}        _suffix = f'_{{_i+1}}' if len(elems) > 1 else ''")
+                a(f"{I}        _plot = g_o.structureplot(_elem)")
+                a(f"{I}        _plot.Phase = {phase_var}")
+                a("")
+
+                for force_key in ('M', 'Q', 'N'):
+                    if r[force_key]:
+                        suffix = self._FORCE_SUFFIX[force_key]
+                        a(f"{I}        _plot.ResultType = g_o.ResultTypes.{rt_prefix}.{suffix}")
+                        a(f'{I}        export_png(_plot, f"{phase_name}_{elem_name}{{_suffix}}_{force_key}", {img_w}, {img_h})')
+                        if r['pdf']:
+                            a(f'{I}        export_pdf(_plot, f"{phase_name}_{elem_name}{{_suffix}}_{force_key}", {img_w}, {img_h})')
+                        a("")
+
+                a(f"{I}except Exception as e:")
+                a(f'{I}    print(f"  FAIL: {{e}}")')
+                a("")
+
+            # ── Cal. Information ──
+            if r['cal_info']:
+                a(f'{I}print("\\n[Cal. Info - {phase_name}]")')
+                a(f"{I}try:")
+                a(f"{I}    _ph = {phase_var}")
+                a(f'{I}    print(f"  Phase: {{_ph.Identification}}")')
+                a(f'{I}    print(f"  Calc type: {{_ph.DeformCalcType}}")')
+                a(f'{I}    print(f"  Steps: {{_ph.ReachedMaxSteps}}")')
+                a(f"{I}except Exception as e:")
+                a(f'{I}    print(f"  FAIL CalInfo: {{e}}")')
+                a("")
+
+        # ─── Summary ───
+        a(f"{I}# ============================================================")
+        a(f"{I}# Summary")
+        a(f"{I}# ============================================================")
+        a(f'{I}print("\\n" + "=" * 50)')
+        a(f'{I}print("SUMMARY")')
+        a(f'{I}print("=" * 50)')
+        a(f'{I}print(f"Output folder: {{output_dir}}")')
+        a("")
+        a(f"{I}png_files = sorted(f for f in os.listdir(output_dir) if f.endswith('.png'))")
+        a(f'{I}print(f"\\nTotal PNG: {{len(png_files)}}")')
+        a("")
+        a(f"{I}for f in png_files:")
+        a(f"{I}    size = os.path.getsize(os.path.join(output_dir, f))")
+        a(f'{I}    print(f"  {{f}} ({{size:,}} bytes)")')
+
+        # ─── Outer except + finally ───
+        a("")
+        a("except Exception as e:")
+        a('    print(f"\\n!!! ERROR: {e}")')
+        a("    import traceback")
+        a("    traceback.print_exc()")
+        a("")
+        a('print("\\n" + "=" * 50)')
+        a('input("Press Enter to close...")')
+
+        return '\n'.join(L)
+
+    @staticmethod
+    def _phase_var_name(phase_name):
+        """Convert phase name to a valid Python variable name"""
+        var = phase_name.replace(' ', '_').replace('-', '_')
+        var = ''.join(c for c in var if c.isalnum() or c == '_')
+        if var[0].isdigit():
+            var = 'p_' + var
+        return f"phase_{var}"
 
     def _create_preview_section(self):
         """Create preview section for Python script"""
