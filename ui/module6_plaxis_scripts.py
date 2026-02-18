@@ -13,10 +13,10 @@ Features:
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-    QTableWidget, QTableWidgetItem, QHeaderView, QFileDialog,
-    QMessageBox, QSplitter, QScrollArea, QComboBox, QLineEdit,
+    QTableWidget, QTableWidgetItem, QFileDialog,
+    QMessageBox, QSplitter, QComboBox, QLineEdit,
     QGroupBox, QTextEdit, QTreeWidget, QTreeWidgetItem,
-    QDialog, QListWidget, QDialogButtonBox, QAbstractItemView,
+    QDialog, QDialogButtonBox, QAbstractItemView,
     QTabWidget
 )
 from PyQt6.QtCore import Qt, QEvent
@@ -1307,66 +1307,78 @@ class Module6PlaxisScripts(QWidget):
     ]
 
     # Column layout for the output table
-    # Group: Deformations(3) | TotalStrain(1) | Stresses(2) | Material(2) | Force(3) | Cal.Info(1) | PDF(1) | Scale(1)
+    # Phase | Deformations(3) | γₛ | Stresses(6) | Pore Pressure(2) | Material(2) | Force(3) | Scaling(4) | Scale
     OUTPUT_COLUMNS = [
-        'Phase',
-        '|u|', 'ux', 'uy',           # Deformations
-        'Total Strain (γₛ)',           # Total Strain
-        'Total stress', 'Effective Stress',  # Stresses
-        'Name', 'Type',                # Material
-        'M', 'Q', 'N',                # Force (kN)
-        'Cal. Information',            # Calculation Info
-        'PNG',                         # PNG
-        'Scale',                       # Scale
+        'Phase',                                  # 0
+        '|u|', 'ux', 'uy',                       # 1-3   Deformations
+        'γₛ',                                     # 4     TotalDeviatoricStrain
+        "σ'xx", "σ'yy",                          # 5-6   Effective Stress
+        'σxx', 'σyy',                            # 7-8   Total Stress
+        'τxy',                                    # 9     Shear Stress
+        'Rel.τ',                                  # 10    RelativeShearStress
+        'PExcess', 'PActive',                     # 11-12 Pore Pressure
+        'Name', 'Type',                           # 13-14 Material
+        'M', 'Q', 'N',                           # 15-17 Force (kN)
+        'Automation',                             # 18    Scaling - auto checkbox
+        'Min.', 'Max.', 'Interval',              # 19-21 Scaling - manual values
+        'Scale',                                  # 22    Image size
     ]
 
     # Columns that use checkboxes (by index)
-    OUTPUT_CHECK_COLS = {1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13}
-    # Columns that are text-editable: Phase(0), Name(7), Scale(14)
-    # Column that is dropdown: Type(8)
+    OUTPUT_CHECK_COLS = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18}
+    # Text-editable: Phase(0), Name(13), Min(19), Max(20), Interval(21), Scale(22)
+    # Dropdown: Type(14)
+
+    # Column widths (shared between header table and data table)
+    _OUTPUT_COL_WIDTHS = [
+        200,           # 0   Phase
+        50, 50, 50,     # 1-3   |u|, ux, uy
+        50,          # 4   γₛ
+        50, 50,        # 5-6   σ'xx, σ'yy
+        50, 50,        # 7-8   σxx, σyy
+        50,          # 9   τxy
+        50,          # 10  Rel.τ
+        80,80,         # 11-12 PExcess, PActive
+        150, 150,    # 13-14 Name, Type
+        50,50,50,     # 15-17 M, Q, N
+        80,             # 18  Automation
+        50, 50, 70,   # 19-21 Min., Max., Interval
+        80,             # 22  Scale
+    ]
 
     def _create_output_script_section(self):
-        """Create output script table with checkboxes for selecting PLAXIS output"""
+        """Create output script table with multi-level header and checkboxes"""
         container = QWidget()
         layout = QVBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
+        layout.setSpacing(0)
 
         # Hint
         hint = QLabel("Name = PLAXIS element name (e.g. Plate_1, EmbeddedBeam_7)  |  ใส่ '-' สำหรับ Soil plot")
         hint.setFont(QFont("SF Pro Display", 9))
-        hint.setStyleSheet("color: #8E8E93;")
+        hint.setStyleSheet("color: #8E8E93; margin-bottom: 4px;")
         layout.addWidget(hint)
 
-        # Output Table
+        # ── Multi-level group header (separate read-only table) ──
+        self._output_header_tbl = self._build_output_header()
+        layout.addWidget(self._output_header_tbl)
+
+        # ── Data table (horizontal header hidden, replaced by header table) ──
         self.output_table = QTableWidget()
         self.output_table.setColumnCount(len(self.OUTPUT_COLUMNS))
         self.output_table.setFont(QFont("SF Pro Display", 9))
-        self.output_table.verticalHeader().setDefaultSectionSize(32)
+        self.output_table.horizontalHeader().setVisible(False)
+        self.output_table.verticalHeader().setVisible(False)
+        self.output_table.verticalHeader().setDefaultSectionSize(30)
 
-        # ── Multi-level header via QHeaderView label ──
-        self.output_table.setHorizontalHeaderLabels(self.OUTPUT_COLUMNS)
-        header = self.output_table.horizontalHeader()
-        header.setFont(QFont("SF Pro Display", 9, QFont.Weight.Bold))
-        header.setDefaultAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        # Column widths
-        col_widths = [
-            110,        # Phase
-            40, 40, 40, # |u|, ux, uy
-            110,        # Total Strain
-            90, 110,    # Total stress, Effective Stress
-            180, 140,   # Name, Type
-            35, 35, 35, # M, Q, N
-            110,        # Cal. Information
-            40,         # PNG
-            90,         # Scale
-        ]
-        for col, w in enumerate(col_widths):
+        for col, w in enumerate(self._OUTPUT_COL_WIDTHS):
             self.output_table.setColumnWidth(col, w)
 
         # Table styling
         self.output_table.setStyleSheet("""
+            QTableWidget {
+                border-top: none;
+            }
             QTableWidget::item:selected {
                 background-color: #E3F2FD;
                 color: black;
@@ -1393,21 +1405,19 @@ class Module6PlaxisScripts(QWidget):
         """)
 
         # Initialize with sample rows
-        # Name = PLAXIS element name (e.g. Plate_1, EmbeddedBeam_7)
-        # User finds these names from PLAXIS Output program
         sample_rows = [
             {'phase': 'Loading', 'name': 'Plate_1', 'type': 'Plates',
-             'checks': {9: True, 10: True}, 'scale': '1600x900'},
+             'checks': {15: True, 16: True}, 'scale': '1600x900'},
             {'phase': 'Loading', 'name': 'EmbeddedBeam_6', 'type': 'Embedded beams',
-             'checks': {9: True, 10: True}, 'scale': '1600x900'},
+             'checks': {15: True, 16: True}, 'scale': '1600x900'},
             {'phase': 'Loading', 'name': 'EmbeddedBeam_7', 'type': 'Embedded beams',
-             'checks': {9: True}, 'scale': '1600x900'},
+             'checks': {15: True}, 'scale': '1600x900'},
             {'phase': 'Loading', 'name': 'EmbeddedBeam_1', 'type': 'Embedded beams',
-             'checks': {9: True}, 'scale': '1600x900'},
+             'checks': {15: True}, 'scale': '1600x900'},
             {'phase': 'LWL_FS', 'name': '-', 'type': '',
-             'checks': {1: True, 4: True, 5: True}, 'scale': '1600x900'},
+             'checks': {1: True, 4: True, 7: True, 18: True}, 'scale': '1600x900'},
             {'phase': 'RDD_FS', 'name': '-', 'type': '',
-             'checks': {1: True, 4: True, 5: True}, 'scale': '1600x900'},
+             'checks': {1: True, 4: True, 7: True, 18: True}, 'scale': '1600x900'},
         ]
 
         self.output_table.setRowCount(len(sample_rows))
@@ -1416,8 +1426,14 @@ class Module6PlaxisScripts(QWidget):
 
         layout.addWidget(self.output_table, 1)
 
+        # Sync horizontal scroll between header and data table
+        self.output_table.horizontalScrollBar().valueChanged.connect(
+            self._output_header_tbl.horizontalScrollBar().setValue
+        )
+
         # Buttons row
         btn_layout = QHBoxLayout()
+        btn_layout.setContentsMargins(0, 6, 0, 0)
         btn_layout.addStretch()
 
         add_btn = QPushButton("+ ROW")
@@ -1434,14 +1450,112 @@ class Module6PlaxisScripts(QWidget):
 
         return container
 
+    def _build_output_header(self):
+        """Build a 3-row merged header table for the output table.
+
+        Col layout (23 cols):
+        0:Phase | 1-3:Deformations | 4:γₛ | 5-10:Stresses | 11-12:PorePressure
+        | 13-14:Material | 15-17:Force | 18-21:Scaling | 22:Scale
+
+        Row 0: Phase(3r) | Deformations(3c) | γₛ(3r) | Stresses(6c) | Pore Pressure(2c) | Material(2c) | Force(3c) | Scaling(4c) | Scale(3r)
+        Row 1:           | |u| ux uy (2r)   |        | Effective(2c) Total(2c) τxy(2r) Rel.τ(2r) | PEx(2r) PAc(2r) | Name(2r) Type(2r) | M Q N(2r) | Auto(2r) Manual(3c) |
+        Row 2:           |                   |        | σ'xx σ'yy | σxx σyy |   |   |   |   |   |   |   |   |          | Min Max Interval |
+        """
+        ncols = len(self.OUTPUT_COLUMNS)
+        tbl = QTableWidget(3, ncols)
+        tbl.horizontalHeader().setVisible(False)
+        tbl.verticalHeader().setVisible(False)
+        tbl.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        tbl.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+        tbl.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        tbl.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        tbl.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        row_h = 22
+        tbl.verticalHeader().setDefaultSectionSize(row_h)
+        tbl.setFixedHeight(3 * row_h + 2)
+
+        for col, w in enumerate(self._OUTPUT_COL_WIDTHS):
+            tbl.setColumnWidth(col, w)
+
+        # Styles
+        grp = "background-color:#E8E8ED; font-weight:bold;"
+        sub = "background-color:#F2F2F7;"
+        leaf = "background-color:#F8F8FA;"
+
+        def cell(text, style=""):
+            item = QTableWidgetItem(text)
+            item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            item.setFont(QFont("SF Pro Display", 8, QFont.Weight.Bold))
+            if style:
+                item.setBackground(QColor(style.split(':')[1].split(';')[0]))
+            return item
+
+        def put(r, c, text, rs=1, cs=1, st=grp):
+            """Place a header cell with optional span"""
+            if rs > 1 or cs > 1:
+                tbl.setSpan(r, c, rs, cs)
+            tbl.setItem(r, c, cell(text, st))
+
+        # ── Row 0: Top-level group headers ──
+        put(0, 0, "Phase", 3, 1, grp)            # col 0
+        put(0, 1, "Deformations", 1, 3, grp)     # cols 1-3
+        put(0, 4, "γₛ", 3, 1, grp)               # col 4
+        put(0, 5, "Stresses", 1, 6, grp)         # cols 5-10
+        put(0, 11, "Pore\nPressure", 1, 2, grp)  # cols 11-12
+        put(0, 13, "Material", 1, 2, grp)        # cols 13-14
+        put(0, 15, "Force (kN)", 1, 3, grp)      # cols 15-17
+        put(0, 18, "Scaling", 1, 4, grp)         # cols 18-21
+        put(0, 22, "Scale", 3, 1, grp)           # col 22
+
+        # ── Row 1: Sub-headers ──
+        put(1, 1, "|u|", 2, 1, sub)              # col 1
+        put(1, 2, "ux", 2, 1, sub)               # col 2
+        put(1, 3, "uy", 2, 1, sub)               # col 3
+        put(1, 5, "Effective", 1, 2, sub)         # cols 5-6
+        put(1, 7, "Total", 1, 2, sub)            # cols 7-8
+        put(1, 9, "τxy", 2, 1, sub)              # col 9
+        put(1, 10, "Rel.τ", 2, 1, sub)           # col 10
+        put(1, 11, "PExcess", 2, 1, sub)         # col 11
+        put(1, 12, "PActive", 2, 1, sub)         # col 12
+        put(1, 13, "Name", 2, 1, sub)            # col 13
+        put(1, 14, "Type", 2, 1, sub)            # col 14
+        put(1, 15, "M", 2, 1, sub)               # col 15
+        put(1, 16, "Q", 2, 1, sub)               # col 16
+        put(1, 17, "N", 2, 1, sub)               # col 17
+        put(1, 18, "Auto", 2, 1, sub)            # col 18
+        put(1, 19, "Manual", 1, 3, sub)          # cols 19-21
+
+        # ── Row 2: Leaf headers ──
+        put(2, 5, "σ'xx", 1, 1, leaf)            # col 5
+        put(2, 6, "σ'yy", 1, 1, leaf)            # col 6
+        put(2, 7, "σxx", 1, 1, leaf)             # col 7
+        put(2, 8, "σyy", 1, 1, leaf)             # col 8
+        put(2, 19, "Min.", 1, 1, leaf)            # col 19
+        put(2, 20, "Max.", 1, 1, leaf)            # col 20
+        put(2, 21, "Interval", 1, 1, leaf)        # col 21
+
+        # Overall style
+        tbl.setStyleSheet("""
+            QTableWidget {
+                border: 1px solid #D1D1D6;
+                border-bottom: none;
+                gridline-color: #D1D1D6;
+            }
+        """)
+
+        return tbl
+
     def _setup_output_row(self, row, data=None):
         """Setup a single row in the output table with checkboxes and dropdown"""
         if data is None:
-            data = {'phase': '', 'name': '', 'type': '', 'checks': {}, 'scale': '1600x900'}
+            data = {'phase': '', 'name': '', 'type': '', 'checks': {},
+                    'scale_min': '', 'scale_max': '', 'scale_interval': '',
+                    'scale': '1600x900'}
 
         for col in range(len(self.OUTPUT_COLUMNS)):
             if col in self.OUTPUT_CHECK_COLS:
-                # Checkbox column
+                # Checkbox column (includes col 13 = Automation)
                 item = QTableWidgetItem()
                 item.setFlags(
                     Qt.ItemFlag.ItemIsUserCheckable
@@ -1460,12 +1574,12 @@ class Module6PlaxisScripts(QWidget):
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.output_table.setItem(row, col, item)
 
-            elif col == 7:  # Name
+            elif col == 13:  # Name
                 item = QTableWidgetItem(data.get('name', ''))
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.output_table.setItem(row, col, item)
 
-            elif col == 8:  # Type (dropdown)
+            elif col == 14:  # Type (dropdown)
                 combo = QComboBox()
                 combo.addItem('')  # Empty option
                 combo.addItems(self.OUTPUT_MATERIAL_TYPES)
@@ -1473,7 +1587,22 @@ class Module6PlaxisScripts(QWidget):
                 self._style_combobox(combo)
                 self.output_table.setCellWidget(row, col, combo)
 
-            elif col == 14:  # Scale
+            elif col == 19:  # Min. (Manual Scaling)
+                item = QTableWidgetItem(data.get('scale_min', ''))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.output_table.setItem(row, col, item)
+
+            elif col == 20:  # Max. (Manual Scaling)
+                item = QTableWidgetItem(data.get('scale_max', ''))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.output_table.setItem(row, col, item)
+
+            elif col == 21:  # Interval (Manual Scaling)
+                item = QTableWidgetItem(data.get('scale_interval', ''))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.output_table.setItem(row, col, item)
+
+            elif col == 22:  # Scale (image size)
                 item = QTableWidgetItem(data.get('scale', '1600x900'))
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.output_table.setItem(row, col, item)
@@ -1572,16 +1701,24 @@ class Module6PlaxisScripts(QWidget):
                 'ux': self._is_output_checked(row, 2),
                 'uy': self._is_output_checked(row, 3),
                 'total_strain': self._is_output_checked(row, 4),
-                'total_stress': self._is_output_checked(row, 5),
-                'effective_stress': self._is_output_checked(row, 6),
-                'name': self._get_output_cell_value(row, 7).strip(),
-                'type': self._get_output_cell_value(row, 8).strip(),
-                'M': self._is_output_checked(row, 9),
-                'Q': self._is_output_checked(row, 10),
-                'N': self._is_output_checked(row, 11),
-                'cal_info': self._is_output_checked(row, 12),
-                'pdf': self._is_output_checked(row, 13),
-                'scale': self._get_output_cell_value(row, 14).strip() or '1600x900',
+                'sig_xx_eff': self._is_output_checked(row, 5),
+                'sig_yy_eff': self._is_output_checked(row, 6),
+                'sig_xx_tot': self._is_output_checked(row, 7),
+                'sig_yy_tot': self._is_output_checked(row, 8),
+                'sig_xy': self._is_output_checked(row, 9),
+                'rel_shear': self._is_output_checked(row, 10),
+                'p_excess': self._is_output_checked(row, 11),
+                'p_active': self._is_output_checked(row, 12),
+                'name': self._get_output_cell_value(row, 13).strip(),
+                'type': self._get_output_cell_value(row, 14).strip(),
+                'M': self._is_output_checked(row, 15),
+                'Q': self._is_output_checked(row, 16),
+                'N': self._is_output_checked(row, 17),
+                'scaling_auto': self._is_output_checked(row, 18),
+                'scale_min': self._get_output_cell_value(row, 19).strip(),
+                'scale_max': self._get_output_cell_value(row, 20).strip(),
+                'scale_interval': self._get_output_cell_value(row, 21).strip(),
+                'scale': self._get_output_cell_value(row, 22).strip() or '1600x900',
             })
         return rows
 
@@ -1599,26 +1736,38 @@ class Module6PlaxisScripts(QWidget):
     }
 
     # Force component → PLAXIS suffix
-    _FORCE_SUFFIX = {'M': 'M2D', 'Q': 'Q2D', 'N': 'N2D'}
+    _FORCE_SUFFIX = {'M': 'M2D', 'Q': 'Q2D', 'N': 'Nx2D'}
 
-    # Soil deformation / stress → ResultTypes.Soil.*
+    # Soil result key → PLAXIS ResultTypes.Soil.* attribute
     _SOIL_RESULTS = {
-        'u_tot':            'Utot',
-        'ux':               'Ux',
-        'uy':               'Uy',
-        'total_strain':     'TotalDeviatoricStrain',
-        'total_stress':     'SigxxTotal',
-        'effective_stress': 'SigxxEffective',
+        'u_tot':        'Utot',
+        'ux':           'Ux',
+        'uy':           'Uy',
+        'total_strain': 'TotalDeviatoricStrain',
+        'sig_xx_eff':   'SigxxE',
+        'sig_yy_eff':   'SigyyE',
+        'sig_xx_tot':   'SigxxT',
+        'sig_yy_tot':   'SigyyT',
+        'sig_xy':       'Sigxy',
+        'rel_shear':    'RelativeShearStress',
+        'p_excess':     'PExcess',
+        'p_active':     'PActive',
     }
 
     # Friendly label for filenames
     _SOIL_LABELS = {
-        'u_tot':            'Utot',
-        'ux':               'Ux',
-        'uy':               'Uy',
-        'total_strain':     'TotalStrain',
-        'total_stress':     'TotalStress',
-        'effective_stress': 'EffectiveStress',
+        'u_tot':        'Utot',
+        'ux':           'Ux',
+        'uy':           'Uy',
+        'total_strain': 'TotalStrain',
+        'sig_xx_eff':   'SigxxE',
+        'sig_yy_eff':   'SigyyE',
+        'sig_xx_tot':   'SigxxT',
+        'sig_yy_tot':   'SigyyT',
+        'sig_xy':       'Sigxy',
+        'rel_shear':    'RelShearStress',
+        'p_excess':     'PExcess',
+        'p_active':     'PActive',
     }
 
     def _generate_output_script(self):
@@ -1661,26 +1810,79 @@ class Module6PlaxisScripts(QWidget):
         a(f"{I}os.makedirs(output_dir, exist_ok=True)")
         a("")
 
-        # ─── Helper: export ───
+        # ─── Helper: Legend Settings ───
         a(f"{I}# ------------------------------------------------------------")
-        a(f"{I}# 3. Helper functions")
+        a(f"{I}# 3. Legend Settings Config")
         a(f"{I}# ------------------------------------------------------------")
-        a(f"{I}def export_png(plot, filename, img_w=1600, img_h=900):")
+        a(f"{I}# None = Auto (PLAXIS default per phase)")
+        a(f"{I}# value = Manual (set Min/Max)")
+        a(f"{I}LEGEND = {{")
+
+        # Build LEGEND dict from all rows
+        legend_entries = {}
+        for r in rows:
+            phase_name = r['phase']
+            name_raw = r['name']
+            struct_type = r['type']
+            is_soil = (not name_raw or name_raw == '-' or not struct_type)
+            scale_min = r.get('scale_min', '')
+            scale_max = r.get('scale_max', '')
+
+            if is_soil:
+                # Soil results → legend key per result type
+                for key in self._SOIL_RESULTS:
+                    if r.get(key):
+                        label = self._SOIL_LABELS[key]
+                        legend_key = f"{phase_name}_{label}"
+                        min_v = scale_min if scale_min else None
+                        max_v = scale_max if scale_max else None
+                        legend_entries[legend_key] = (min_v, max_v)
+            else:
+                # Structure results → legend key per force
+                elem_name = name_raw.strip('"')
+                for fk in ('M', 'Q', 'N'):
+                    if r.get(fk):
+                        legend_key = f"{phase_name}_{elem_name}_{fk}"
+                        min_v = scale_min if scale_min else None
+                        max_v = scale_max if scale_max else None
+                        legend_entries[legend_key] = (min_v, max_v)
+
+        for lk, (mn, mx) in legend_entries.items():
+            mn_s = mn if mn else 'None'
+            mx_s = mx if mx else 'None'
+            a(f'{I}    "{lk}": {{"min": {mn_s}, "max": {mx_s}}},')
+        a(f"{I}}}")
+        a("")
+
+        # ─── Helper functions ───
+        a(f"{I}# ------------------------------------------------------------")
+        a(f"{I}# 4. Helper functions")
+        a(f"{I}# ------------------------------------------------------------")
+        a(f"{I}def apply_legend(plot, key):")
+        a(f'{I}    """Apply legend settings: None=Auto, value=Manual"""')
+        a(f"{I}    cfg = LEGEND.get(key)")
+        a(f"{I}    if cfg is None:")
+        a(f"{I}        return")
+        a(f'{I}    if cfg["min"] is None and cfg["max"] is None:')
+        a(f"{I}        return")
+        a(f"{I}    try:")
+        a(f'{I}        if cfg["min"] is not None:')
+        a(f'{I}            plot.LegendSettings.MinValue = cfg["min"]')
+        a(f'{I}        if cfg["max"] is not None:')
+        a(f'{I}            plot.LegendSettings.MaxValue = cfg["max"]')
+        a(f"{I}    except Exception as e:")
+        a(f'{I}        print(f"  NOTE: LegendSettings error ({{e}})")')
+        a("")
+
+        a(f"{I}def export_plot(plot, filename, legend_key=None, img_w=1600, img_h=900):")
+        a(f"{I}    if legend_key:")
+        a(f"{I}        apply_legend(plot, legend_key)")
         a(f'{I}    filepath = os.path.join(output_dir, f"{{filename}}.png")')
         a(f"{I}    try:")
         a(f"{I}        plot.export(filepath, img_w, img_h)")
-        a(f'{I}        print(f"  OK {{filename}}.png")')
-        a(f"{I}        return True")
-        a(f"{I}    except Exception as e:")
-        a(f'{I}        print(f"  FAIL {{filename}}: {{e}}")')
-        a(f"{I}        return False")
-        a("")
-
-        a(f"{I}def export_pdf(plot, filename, img_w=1600, img_h=900):")
-        a(f'{I}    filepath = os.path.join(output_dir, f"{{filename}}.pdf")')
-        a(f"{I}    try:")
-        a(f"{I}        plot.export(filepath, img_w, img_h)")
-        a(f'{I}        print(f"  OK {{filename}}.pdf")')
+        a(f"{I}        cfg = LEGEND.get(legend_key, {{}})")
+        a(f'{I}        mode = "Auto" if (cfg.get("min") is None and cfg.get("max") is None) else f"Manual [{{cfg[\'min\']}} ~ {{cfg[\'max\']}}]"')
+        a(f'{I}        print(f"  OK {{filename}}.png  [{{mode}}]")')
         a(f"{I}        return True")
         a(f"{I}    except Exception as e:")
         a(f'{I}        print(f"  FAIL {{filename}}: {{e}}")')
@@ -1717,7 +1919,7 @@ class Module6PlaxisScripts(QWidget):
                 seen_phases.add(r['phase'])
 
         a(f"{I}# ------------------------------------------------------------")
-        a(f"{I}# 4. Get phases")
+        a(f"{I}# 5. Get phases")
         a(f"{I}# ------------------------------------------------------------")
         for phase_name in unique_phases:
             var = self._phase_var_name(phase_name)
@@ -1727,7 +1929,7 @@ class Module6PlaxisScripts(QWidget):
 
         # ─── Process each row ───
         a(f"{I}# ============================================================")
-        a(f"{I}# 5. Generate output plots")
+        a(f"{I}# 6. Generate output plots")
         a(f"{I}# ============================================================")
         a("")
 
@@ -1739,7 +1941,7 @@ class Module6PlaxisScripts(QWidget):
             struct_type = r['type']
             scale = r['scale']
 
-            # Parse scale (image size)
+            # Parse image size
             if 'x' in scale.lower():
                 parts = scale.lower().split('x')
                 img_w, img_h = parts[0].strip(), parts[1].strip()
@@ -1759,9 +1961,7 @@ class Module6PlaxisScripts(QWidget):
 
             # ── Case A: Soil result (no material / Name is "-" or empty) ──
             is_soil = (not name_raw or name_raw == '-' or not struct_type)
-            has_soil_checks = any(r[k] for k in [
-                'u_tot', 'ux', 'uy', 'total_strain',
-                'total_stress', 'effective_stress'])
+            has_soil_checks = any(r[k] for k in self._SOIL_RESULTS)
 
             if is_soil and has_soil_checks:
                 a(f'{I}print("\\n[Soil Results]")')
@@ -1774,10 +1974,9 @@ class Module6PlaxisScripts(QWidget):
                     if r.get(key):
                         label = self._SOIL_LABELS[key]
                         fname = f"{phase_name}_{label}"
+                        legend_key = f"{phase_name}_{label}"
                         a(f"{I}    soil_plot.ResultType = g_o.ResultTypes.Soil.{result_attr}")
-                        a(f'{I}    export_png(soil_plot, "{fname}", {img_w}, {img_h})')
-                        if r['pdf']:
-                            a(f'{I}    export_pdf(soil_plot, "{fname}", {img_w}, {img_h})')
+                        a(f'{I}    export_plot(soil_plot, "{fname}", "{legend_key}", {img_w}, {img_h})')
                         a("")
 
                 a(f"{I}except Exception as e:")
@@ -1807,26 +2006,13 @@ class Module6PlaxisScripts(QWidget):
                 for force_key in ('M', 'Q', 'N'):
                     if r[force_key]:
                         suffix = self._FORCE_SUFFIX[force_key]
+                        legend_key = f"{phase_name}_{elem_name}_{force_key}"
                         a(f"{I}        _plot.ResultType = g_o.ResultTypes.{rt_prefix}.{suffix}")
-                        a(f'{I}        export_png(_plot, f"{phase_name}_{elem_name}{{_suffix}}_{force_key}", {img_w}, {img_h})')
-                        if r['pdf']:
-                            a(f'{I}        export_pdf(_plot, f"{phase_name}_{elem_name}{{_suffix}}_{force_key}", {img_w}, {img_h})')
+                        a(f'{I}        export_plot(_plot, f"{phase_name}_{elem_name}{{_suffix}}_{force_key}", "{legend_key}", {img_w}, {img_h})')
                         a("")
 
                 a(f"{I}except Exception as e:")
                 a(f'{I}    print(f"  FAIL: {{e}}")')
-                a("")
-
-            # ── Cal. Information ──
-            if r['cal_info']:
-                a(f'{I}print("\\n[Cal. Info - {phase_name}]")')
-                a(f"{I}try:")
-                a(f"{I}    _ph = {phase_var}")
-                a(f'{I}    print(f"  Phase: {{_ph.Identification}}")')
-                a(f'{I}    print(f"  Calc type: {{_ph.DeformCalcType}}")')
-                a(f'{I}    print(f"  Steps: {{_ph.ReachedMaxSteps}}")')
-                a(f"{I}except Exception as e:")
-                a(f'{I}    print(f"  FAIL CalInfo: {{e}}")')
                 a("")
 
         # ─── Summary ───
@@ -2471,12 +2657,15 @@ class Module6PlaxisScripts(QWidget):
         for row in range(self.output_table.rowCount()):
             row_dict = {
                 'phase': self.output_table.item(row, 0).text() if self.output_table.item(row, 0) else '',
-                'name': self.output_table.item(row, 7).text() if self.output_table.item(row, 7) else '',
-                'scale': self.output_table.item(row, 14).text() if self.output_table.item(row, 14) else '',
+                'name': self.output_table.item(row, 13).text() if self.output_table.item(row, 13) else '',
+                'scale_min': self.output_table.item(row, 19).text() if self.output_table.item(row, 19) else '',
+                'scale_max': self.output_table.item(row, 20).text() if self.output_table.item(row, 20) else '',
+                'scale_interval': self.output_table.item(row, 21).text() if self.output_table.item(row, 21) else '',
+                'scale': self.output_table.item(row, 22).text() if self.output_table.item(row, 22) else '',
                 'checks': {},
             }
             # Type dropdown
-            type_combo = self.output_table.cellWidget(row, 8)
+            type_combo = self.output_table.cellWidget(row, 14)
             row_dict['type'] = type_combo.currentText() if type_combo else ''
             # Checkboxes
             for col in self.OUTPUT_CHECK_COLS:
