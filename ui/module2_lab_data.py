@@ -200,6 +200,10 @@ class Module2LabData(QWidget):
 
         # Remove selection highlight (no blue cover on selected cells)
         table.setStyleSheet("""
+            QTableWidget::item:hover {
+                background-color: rgba(0, 122, 255, 0.06);
+                color: black;
+            }
             QTableWidget::item:selected {
                 background-color: transparent;
                 color: black;
@@ -207,6 +211,13 @@ class Module2LabData(QWidget):
             QTableWidget::item:focus {
                 background-color: transparent;
                 border: 1px solid #007AFF;
+            }
+            QTableWidget QLineEdit {
+                border: none;
+                padding: 0px 2px;
+                background-color: white;
+                selection-background-color: rgba(0, 122, 255, 0.15);
+                selection-color: black;
             }
         """)
 

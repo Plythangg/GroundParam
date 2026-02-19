@@ -282,6 +282,15 @@ class Module6PlaxisScripts(QWidget):
         tab1_layout.addWidget(self._create_borehole_water_contour_section())
         tab1_layout.addWidget(self._create_layer_table_section(), 1)
 
+        tab1_btn_layout = QHBoxLayout()
+        tab1_btn_layout.addStretch()
+        btn_load = QPushButton("Load from Module 4")
+        btn_load.setToolTip("Load layer data from Module 4")
+        btn_load.setFont(QFont("SF Pro Display", 10))
+        btn_load.clicked.connect(self._load_from_module4)
+        tab1_btn_layout.addWidget(btn_load)
+        tab1_layout.addLayout(tab1_btn_layout)
+
         self.sub_tabs.addTab(tab1_widget, "Borehole && Layer Properties")
 
         # ── Tab 2: Staged Construction ──
@@ -298,7 +307,22 @@ class Module6PlaxisScripts(QWidget):
         tab3_widget = QWidget()
         tab3_layout = QVBoxLayout(tab3_widget)
         tab3_layout.setContentsMargins(8, 12, 8, 8)
-        tab3_layout.setSpacing(12)
+        tab3_layout.setSpacing(8)
+
+        tab3_btn_layout = QHBoxLayout()
+        tab3_btn_layout.addStretch()
+        btn_generate = QPushButton("Generate Script")
+        btn_generate.setToolTip("Generate Python script from table data")
+        btn_generate.setFont(QFont("SF Pro Display", 10))
+        btn_generate.clicked.connect(self._run_code)
+        tab3_btn_layout.addWidget(btn_generate)
+
+        btn_save = QPushButton("Save .py")
+        btn_save.setToolTip("Save Python script to file")
+        btn_save.setFont(QFont("SF Pro Display", 10))
+        btn_save.clicked.connect(self._save_script)
+        tab3_btn_layout.addWidget(btn_save)
+        tab3_layout.addLayout(tab3_btn_layout)
 
         tab3_layout.addWidget(self._create_preview_section(), 1)
 
@@ -365,29 +389,6 @@ class Module6PlaxisScripts(QWidget):
         layout.addWidget(subtitle)
 
         layout.addStretch()
-
-        # Load from Module 4 button
-        btn_load = QPushButton("Load from Module 4")
-        btn_load.setToolTip("Load layer data from Module 4")
-        btn_load.setFont(QFont("SF Pro Display", 10))
-        btn_load.setMaximumWidth(200)
-        btn_load.clicked.connect(self._load_from_module4)
-        layout.addWidget(btn_load)
-
-        # Action buttons
-        btn_generate = QPushButton("Generate Script")
-        btn_generate.setToolTip("Generate Python script from table data")
-        btn_generate.setFont(QFont("SF Pro Display", 10))
-        btn_generate.setMaximumWidth(200)
-        btn_generate.clicked.connect(self._run_code)
-        layout.addWidget(btn_generate)
-
-        btn_save = QPushButton("Save .py")
-        btn_save.setToolTip("Save Python script to file")
-        btn_save.setFont(QFont("SF Pro Display", 10))
-        btn_save.setMaximumWidth(100)
-        btn_save.clicked.connect(self._save_script)
-        layout.addWidget(btn_save)
 
         return layout
 
@@ -492,12 +493,19 @@ class Module6PlaxisScripts(QWidget):
         # Style for table - no white background covering text
         self.layer_table.setStyleSheet("""
             QTableWidget::item:selected {
-                background-color: #E3F2FD;
+                background-color: transparent;
                 color: black;
             }
             QTableWidget::item:focus {
-                background-color: #E3F2FD;
+                background-color: transparent;
                 border: 1px solid #007AFF;
+            }
+            QTableWidget QLineEdit {
+                border: none;
+                padding: 0px 2px;
+                background-color: white;
+                selection-background-color: rgba(0, 122, 255, 0.15);
+                selection-color: black;
             }
             QComboBox {
                 background-color: transparent;
@@ -512,7 +520,7 @@ class Module6PlaxisScripts(QWidget):
             }
             QComboBox QAbstractItemView {
                 background-color: white;
-                selection-background-color: #E3F2FD;
+                selection-background-color: rgba(0, 122, 255, 0.15);
             }
         """)
 
@@ -1380,12 +1388,19 @@ class Module6PlaxisScripts(QWidget):
                 border-top: none;
             }
             QTableWidget::item:selected {
-                background-color: #E3F2FD;
+                background-color: transparent;
                 color: black;
             }
             QTableWidget::item:focus {
-                background-color: #E3F2FD;
+                background-color: transparent;
                 border: 1px solid #007AFF;
+            }
+            QTableWidget QLineEdit {
+                border: none;
+                padding: 0px 2px;
+                background-color: white;
+                selection-background-color: rgba(0, 122, 255, 0.15);
+                selection-color: black;
             }
             QComboBox {
                 background-color: transparent;
@@ -1400,7 +1415,7 @@ class Module6PlaxisScripts(QWidget):
             }
             QComboBox QAbstractItemView {
                 background-color: white;
-                selection-background-color: #E3F2FD;
+                selection-background-color: rgba(0, 122, 255, 0.15);
             }
         """)
 
@@ -2118,7 +2133,6 @@ class Module6PlaxisScripts(QWidget):
                 su_val = line_table.item(m4_row, 4).text() if line_table.item(m4_row, 4) else ''
                 phi_val = line_table.item(m4_row, 5).text() if line_table.item(m4_row, 5) else ''
                 e_val = line_table.item(m4_row, 6).text() if line_table.item(m4_row, 6) else ''
-                k0_val = line_table.item(m4_row, 7).text() if line_table.item(m4_row, 7) else ''
 
                 # Get soil type from combo box in column 8
                 soil_type_combo = line_table.cellWidget(m4_row, 8)
