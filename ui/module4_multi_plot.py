@@ -819,10 +819,9 @@ class Module4MultiPlot(QWidget):
         self.info_label.setText(f"Loaded data for {len(self.bh_names)} borehole(s)")
 
     def refresh_from_module3(self):
-        """Refresh plot data from Module 3 without user interaction.
-        Called automatically when Module 3 results are updated (e.g., lab data changes).
-        Only refreshes if data was previously loaded."""
-        if not self.plot_data or not self.module3:
+        """Auto-refresh: called whenever Module 3 emits results_updated.
+        Always does a full silent reload — works on first calculation too."""
+        if not self.module3:
             return
 
         module3_data = self.module3.get_results()
@@ -830,22 +829,31 @@ class Module4MultiPlot(QWidget):
             return
 
         results = module3_data.get('results', {})
+        bh_settings = module3_data.get('bh_settings', {})
         if not results:
             return
 
-        # Update plot data with latest results from Module 3
+        # Full reload (silent — no message boxes)
+        self.plot_data = {}
+        self.bh_names = list(results.keys())
+        self.bh_settings = bh_settings
+
         for bh_name, bh_results in results.items():
-            if bh_name not in self.plot_data:
-                continue
+            self.plot_data[bh_name] = {}
             for result in bh_results:
                 depth = result['depth']
-                if depth in self.plot_data[bh_name]:
-                    self.plot_data[bh_name][depth]['gamma_sat'] = result.get('gamma_sat')
-                    self.plot_data[bh_name][depth]['su'] = result.get('su')
-                    self.plot_data[bh_name][depth]['phi'] = result.get('phi')
+                self.plot_data[bh_name][depth] = {
+                    'gamma_sat': result.get('gamma_sat'),
+                    'spt': result.get('n_value'),
+                    'su': result.get('su'),
+                    'phi': result.get('phi'),
+                    'e_modulus': result.get('e_modulus'),
+                    'k0': result.get('k0'),
+                    'classification': result.get('classification', '')
+                }
 
-        # Refresh plots
         self.update_plots()
+        self.info_label.setText(f"Loaded data for {len(self.bh_names)} borehole(s) from Module 3")
 
     def update_plots(self):
         """Update all parameter plots (horizontal layout)"""

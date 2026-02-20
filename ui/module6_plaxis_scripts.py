@@ -190,6 +190,8 @@ class Module6PlaxisScripts(QWidget):
         self.water_levels = {'LWL': None, 'HWL': None, 'user_defined': None}
         self.soil_contour = {'xmin': 0, 'xmax': 100, 'ymin': 75, 'ymax': 100}
 
+        # Output script export folder (user-selectable)
+        self._output_dir = r"C:\Users\Public\Documents\PLAXIS_Exports"
 
         self._setup_ui()
 
@@ -336,6 +338,20 @@ class Module6PlaxisScripts(QWidget):
 
         # Buttons row for output script
         out_btn_layout = QHBoxLayout()
+
+        # ── Left: folder picker ──
+        btn_folder = QPushButton("Export Folder...")
+        btn_folder.setToolTip("Select output folder for exported PNG files")
+        btn_folder.setFont(QFont("SF Pro Display", 10))
+        btn_folder.clicked.connect(self._pick_output_dir)
+        out_btn_layout.addWidget(btn_folder)
+
+        self._output_dir_label = QLabel(self._output_dir)
+        self._output_dir_label.setFont(QFont("SF Pro Display", 9))
+        self._output_dir_label.setStyleSheet("color: #6E6E73;")
+        self._output_dir_label.setWordWrap(False)
+        out_btn_layout.addWidget(self._output_dir_label, 1)
+
         out_btn_layout.addStretch()
 
         btn_gen_out = QPushButton("Generate Output Script")
@@ -462,8 +478,49 @@ class Module6PlaxisScripts(QWidget):
 
         layout.addStretch()
 
+        # ---- Export CSV ----
+        btn_csv = QPushButton("Export CSV")
+        btn_csv.setToolTip("Export layer table to CSV file")
+        btn_csv.setFont(QFont("SF Pro Display", 10))
+        btn_csv.clicked.connect(self._export_layer_csv)
+        layout.addWidget(btn_csv)
+
         group.setLayout(layout)
         return group
+
+    def _export_layer_csv(self):
+        """Export the layer properties table to a CSV file"""
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export Layer Table as CSV", "layer_properties.csv",
+            "CSV Files (*.csv)"
+        )
+        if not path:
+            return
+        try:
+            import csv
+            table = self.layer_table
+            ncols = table.columnCount()
+            nrows = table.rowCount()
+
+            # Collect headers from horizontal header
+            headers = []
+            for col in range(ncols):
+                item = table.horizontalHeaderItem(col)
+                headers.append(item.text() if item else f"Col{col}")
+
+            with open(path, 'w', newline='', encoding='utf-8-sig') as f:
+                writer = csv.writer(f)
+                writer.writerow(headers)
+                for row in range(nrows):
+                    row_data = []
+                    for col in range(ncols):
+                        row_data.append(self._get_layer_cell_value(row, col))
+                    writer.writerow(row_data)
+
+            QMessageBox.information(self, "Export CSV",
+                                    f"Exported {nrows} rows to:\n{path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export CSV Error", str(e))
 
     def _create_layer_table_section(self):
         """Create layer properties table matching PLAXIS requirements"""
@@ -1666,6 +1723,14 @@ class Module6PlaxisScripts(QWidget):
 
         return container
 
+    def _pick_output_dir(self):
+        """Let user select the PNG export folder for Output script"""
+        folder = QFileDialog.getExistingDirectory(
+            self, "Select Output Folder", self._output_dir)
+        if folder:
+            self._output_dir = folder
+            self._output_dir_label.setText(folder)
+
     def _run_output_code(self):
         """Preview the generated output script"""
         script = self._generate_output_script()
@@ -1821,7 +1886,7 @@ class Module6PlaxisScripts(QWidget):
         a(f"{I}# ------------------------------------------------------------")
         a(f"{I}# 2. Setup")
         a(f"{I}# ------------------------------------------------------------")
-        a(f'{I}output_dir = r"C:\\Users\\Public\\Documents\\PLAXIS_Exports"')
+        a(f'{I}output_dir = r"{self._output_dir}"')
         a(f"{I}os.makedirs(output_dir, exist_ok=True)")
         a("")
 
