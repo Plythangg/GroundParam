@@ -172,6 +172,11 @@ class Application:
 def main():
     """Main entry point for the application"""
 
+    # Must be set BEFORE creating QApplication for per-monitor DPI to work correctly
+    QApplication.setHighDpiScaleFactorRoundingPolicy(
+        Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
+    )
+
     # Create Qt application
     app = QApplication(sys.argv)
 
@@ -187,11 +192,6 @@ def main():
 
     # Apply Apple-style theme
     app.setStyleSheet(get_stylesheet('light'))
-
-    # Enable High DPI support
-    QApplication.setHighDpiScaleFactorRoundingPolicy(
-        Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
-    )
 
     # Create application controller and start with login
     application = Application(app)

@@ -111,7 +111,7 @@ class Module1SPTPlot(QWidget):
         self.bh_settings = {}  # {BH_name: {'surface_elev': 100.0, 'water_level': 0.0, 'pile_top': 100.0, 'pile_tip': 85.0}}
 
         # Axis limits for each borehole
-        self.axis_limits = {}  # {BH_name: {'xmin': 0, 'xmax': 100, 'ymin': 0, 'ymax': 30}}
+        self.axis_limits = {}  # {BH_name: {'xmin':0,'xmax':60,'ymin':100,'ymax':70,'x_major':0,'x_minor':0,'y_major':0,'y_minor':0}}
 
         self.label_size = 8
         self.selected_bh = None  # Currently selected BH for axis adjustment
@@ -181,61 +181,21 @@ class Module1SPTPlot(QWidget):
         separator.setStyleSheet("color: #D1D1D6;")
         layout.addWidget(separator)
 
-        # Axis Settings
+        # BH Selector for axis context
         layout.addWidget(QLabel("Axis:"))
         self.bh_selector = QComboBox()
-        self.bh_selector.setFont(QFont("SF Pro Display", 14))
+        self.bh_selector.setFont(QFont("SF Pro Display", 11))
         self.bh_selector.setMaximumWidth(80)
         self.bh_selector.currentTextChanged.connect(self.on_bh_selected)
         layout.addWidget(self.bh_selector)
 
-        # X limits
-        layout.addWidget(QLabel("X:"))
-        self.xmin_spin = QDoubleSpinBox()
-        self.xmin_spin.setFont(QFont("SF Pro Display", 14))
-        self.xmin_spin.setMaximumWidth(80)
-        self.xmin_spin.setRange(-1000, 1000)
-        self.xmin_spin.setValue(0)
-        self.xmin_spin.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)  # Remove increment/decrement buttons
-        self.xmin_spin.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))  # Use standard number format
-        self.xmin_spin.valueChanged.connect(self.update_axis_limits)
-        layout.addWidget(self.xmin_spin)
-
-        layout.addWidget(QLabel("-"))
-
-        self.xmax_spin = QDoubleSpinBox()
-        self.xmax_spin.setFont(QFont("SF Pro Display", 14))
-        self.xmax_spin.setMaximumWidth(80)
-        self.xmax_spin.setRange(-1000, 1000)
-        self.xmax_spin.setValue(60)
-        self.xmax_spin.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)  # Remove increment/decrement buttons
-        self.xmax_spin.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))  # Use standard number format
-        self.xmax_spin.valueChanged.connect(self.update_axis_limits)
-        layout.addWidget(self.xmax_spin)
-
-        # Y limits
-        layout.addWidget(QLabel("Y:"))
-        self.ymin_spin = QDoubleSpinBox()
-        self.ymin_spin.setFont(QFont("SF Pro Display", 14))
-        self.ymin_spin.setMaximumWidth(80)
-        self.ymin_spin.setRange(-1000, 1000)
-        self.ymin_spin.setValue(100)
-        self.ymin_spin.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)  # Remove increment/decrement buttons
-        self.ymin_spin.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))  # Use standard number format
-        self.ymin_spin.valueChanged.connect(self.update_axis_limits)
-        layout.addWidget(self.ymin_spin)
-
-        layout.addWidget(QLabel("-"))
-
-        self.ymax_spin = QDoubleSpinBox()
-        self.ymax_spin.setFont(QFont("SF Pro Display", 14))
-        self.ymax_spin.setMaximumWidth(80)
-        self.ymax_spin.setRange(-1000, 1000)
-        self.ymax_spin.setValue(70)  # Changed default from 30 to 100
-        self.ymax_spin.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)  # Remove increment/decrement buttons
-        self.ymax_spin.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))  # Use standard number format
-        self.ymax_spin.valueChanged.connect(self.update_axis_limits)
-        layout.addWidget(self.ymax_spin)
+        # Axis Settings icon button
+        btn_axis = QPushButton("⚙ Axis")
+        btn_axis.setFont(QFont("SF Pro Display", 11))
+        btn_axis.setMaximumWidth(80)
+        btn_axis.setToolTip("Open axis settings (Xmin, Xmax, Ytop, Ybottom)")
+        btn_axis.clicked.connect(self._show_axis_dialog)
+        layout.addWidget(btn_axis)
 
         # Separator
         separator2 = QLabel("|")
@@ -245,7 +205,7 @@ class Module1SPTPlot(QWidget):
         # Y-axis type dropdown (Depth or Elevation)
         layout.addWidget(QLabel("Y-axis:"))
         self.y_axis_combo = QComboBox()
-        self.y_axis_combo.setFont(QFont("SF Pro Display", 14))
+        self.y_axis_combo.setFont(QFont("SF Pro Display", 11))
         self.y_axis_combo.setMaximumWidth(100)
         self.y_axis_combo.addItems(["Elevation", "Depth"])
         self.y_axis_combo.setCurrentText("Elevation")  # Default to Elevation
@@ -257,31 +217,13 @@ class Module1SPTPlot(QWidget):
         separator_pile.setStyleSheet("color: #D1D1D6;")
         layout.addWidget(separator_pile)
 
-        # Pile Top input
-        layout.addWidget(QLabel("Pile Top:"))
-        self.pile_top_spin = QDoubleSpinBox()
-        self.pile_top_spin.setFont(QFont("SF Pro Display", 14))
-        self.pile_top_spin.setMaximumWidth(90)
-        self.pile_top_spin.setRange(-1000, 1000)
-        self.pile_top_spin.setValue(100.0)
-        self.pile_top_spin.setDecimals(2)
-        self.pile_top_spin.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
-        self.pile_top_spin.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))
-        self.pile_top_spin.valueChanged.connect(self.on_pile_settings_changed)
-        layout.addWidget(self.pile_top_spin)
-
-        # Pile Tip input
-        layout.addWidget(QLabel("Pile Tip:"))
-        self.pile_tip_spin = QDoubleSpinBox()
-        self.pile_tip_spin.setFont(QFont("SF Pro Display", 14))
-        self.pile_tip_spin.setMaximumWidth(90)
-        self.pile_tip_spin.setRange(-1000, 1000)
-        self.pile_tip_spin.setValue(85.0)
-        self.pile_tip_spin.setDecimals(2)
-        self.pile_tip_spin.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
-        self.pile_tip_spin.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))
-        self.pile_tip_spin.valueChanged.connect(self.on_pile_settings_changed)
-        layout.addWidget(self.pile_tip_spin)
+        # Pile Settings icon button
+        btn_pile = QPushButton("📐 Pile")
+        btn_pile.setFont(QFont("SF Pro Display", 11))
+        btn_pile.setMaximumWidth(85)
+        btn_pile.setToolTip("Open pile settings (Pile Top, Pile Tip, Pile Length)")
+        btn_pile.clicked.connect(self._show_pile_dialog)
+        layout.addWidget(btn_pile)
 
         # Separator
         separator_vline = QLabel("|")
@@ -291,14 +233,14 @@ class Module1SPTPlot(QWidget):
         # Vertical line checkbox
         from PyQt6.QtWidgets import QCheckBox
         self.vline_checkbox = QCheckBox("V-Line")
-        self.vline_checkbox.setFont(QFont("SF Pro Display", 12))
+        self.vline_checkbox.setFont(QFont("SF Pro Display", 11))
         self.vline_checkbox.setChecked(False)
         self.vline_checkbox.stateChanged.connect(self.update_plots)
         layout.addWidget(self.vline_checkbox)
 
         # Vertical line X value
         self.vline_x_spin = QDoubleSpinBox()
-        self.vline_x_spin.setFont(QFont("SF Pro Display", 14))
+        self.vline_x_spin.setFont(QFont("SF Pro Display", 11))
         self.vline_x_spin.setMaximumWidth(70)
         self.vline_x_spin.setRange(0, 1000)
         self.vline_x_spin.setValue(30.0)
@@ -311,7 +253,7 @@ class Module1SPTPlot(QWidget):
         # Label size
         layout.addWidget(QLabel("Label:"))
         self.label_size_spin = QSpinBox()
-        self.label_size_spin.setFont(QFont("SF Pro Display", 14))
+        self.label_size_spin.setFont(QFont("SF Pro Display", 11))
         self.label_size_spin.setMaximumWidth(100)
         self.label_size_spin.setRange(6, 16)
         self.label_size_spin.setValue(self.label_size)
@@ -323,14 +265,14 @@ class Module1SPTPlot(QWidget):
 
         # Add/Remove BH buttons - compact
         btn_add_bh = QPushButton("+ BH")
-        btn_add_bh.setFont(QFont("SF Pro Display", 14))
+        btn_add_bh.setFont(QFont("SF Pro Display", 11))
         btn_add_bh.setMaximumWidth(60)
         btn_add_bh.setToolTip("Add borehole")
         btn_add_bh.clicked.connect(self.add_borehole)
         layout.addWidget(btn_add_bh)
 
         btn_remove_bh = QPushButton("- BH")
-        btn_remove_bh.setFont(QFont("SF Pro Display", 14))
+        btn_remove_bh.setFont(QFont("SF Pro Display", 11))
         btn_remove_bh.setMaximumWidth(60)
         btn_remove_bh.setObjectName("secondary")
         btn_remove_bh.setToolTip("Remove borehole")
@@ -344,14 +286,14 @@ class Module1SPTPlot(QWidget):
 
         # Add/Remove Row buttons
         btn_add_row = QPushButton("+ Row")
-        btn_add_row.setFont(QFont("SF Pro Display", 14))
+        btn_add_row.setFont(QFont("SF Pro Display", 11))
         btn_add_row.setMaximumWidth(70)
         btn_add_row.setToolTip("Add depth row")
         btn_add_row.clicked.connect(self.add_depth_row)
         layout.addWidget(btn_add_row)
 
         btn_remove_row = QPushButton("- Row")
-        btn_remove_row.setFont(QFont("SF Pro Display", 14))
+        btn_remove_row.setFont(QFont("SF Pro Display", 11))
         btn_remove_row.setMaximumWidth(70)
         btn_remove_row.setObjectName("secondary")
         btn_remove_row.setToolTip("Remove last depth row")
@@ -365,14 +307,14 @@ class Module1SPTPlot(QWidget):
 
         # Action buttons - compact
         btn_save = QPushButton("Save")
-        btn_save.setFont(QFont("SF Pro Display", 13))
+        btn_save.setFont(QFont("SF Pro Display", 11))
         btn_save.setMaximumWidth(70)
         btn_save.setToolTip("Save data")
         btn_save.clicked.connect(self.save_data)
         layout.addWidget(btn_save)
 
         btn_clear = QPushButton("Clear")
-        btn_clear.setFont(QFont("SF Pro Display", 13))
+        btn_clear.setFont(QFont("SF Pro Display", 11))
         btn_clear.setMaximumWidth(70)
         btn_clear.setObjectName("secondary")
         btn_clear.setToolTip("Clear all data")
@@ -380,14 +322,14 @@ class Module1SPTPlot(QWidget):
         layout.addWidget(btn_clear)
 
         btn_export_png = QPushButton("PNG")
-        btn_export_png.setFont(QFont("SF Pro Display", 13))
+        btn_export_png.setFont(QFont("SF Pro Display", 11))
         btn_export_png.setMaximumWidth(70)
         btn_export_png.setToolTip("Export preview to PNG")
         btn_export_png.clicked.connect(self.export_preview_png)
         layout.addWidget(btn_export_png)
 
         btn_export_pdf = QPushButton("PDF")
-        btn_export_pdf.setFont(QFont("SF Pro Display", 13))
+        btn_export_pdf.setFont(QFont("SF Pro Display", 11))
         btn_export_pdf.setMaximumWidth(70)
         btn_export_pdf.setToolTip("Export preview to PDF")
         btn_export_pdf.clicked.connect(self.export_preview_pdf)
@@ -461,7 +403,11 @@ class Module1SPTPlot(QWidget):
         # Initialize empty data structure and default axis limits
         for bh in self.bh_names:
             self.borehole_data[bh] = {}
-            self.axis_limits[bh] = {'xmin': 0, 'xmax': 60, 'ymin': 100, 'ymax': 70}
+            self.axis_limits[bh] = {'xmin': 0, 'xmax': 60, 'ymin': 100, 'ymax': 70,
+                                     'x_major': 0, 'x_minor': 0, 'y_major': 0, 'y_minor': 0,
+                                     'x_major_label': 9, 'x_minor_label': 7,
+                                     'y_major_label': 9, 'y_minor_label': 7,
+                                     'major_alpha': 0.3, 'minor_alpha': 0.15}
             self.bh_settings[bh] = {
                 'surface_elev': 100.0,
                 'water_level': 0.0,
@@ -473,7 +419,11 @@ class Module1SPTPlot(QWidget):
                 self.borehole_data[bh][depth] = {'spt': None, 'class': ''}
 
         # Initialize "All BH" axis limits (for applying to all boreholes at once)
-        self.axis_limits["All BH"] = {'xmin': 0, 'xmax': 60, 'ymin': 100, 'ymax': 70}
+        self.axis_limits["All BH"] = {'xmin': 0, 'xmax': 60, 'ymin': 100, 'ymax': 70,
+                                       'x_major': 0, 'x_minor': 0, 'y_major': 0, 'y_minor': 0,
+                                       'x_major_label': 9, 'x_minor_label': 7,
+                                       'y_major_label': 9, 'y_minor_label': 7,
+                                       'major_alpha': 0.3, 'minor_alpha': 0.15}
 
         # Sample data for BH-1
         sample_data = {
@@ -819,101 +769,264 @@ class Module1SPTPlot(QWidget):
         # Update plots
         self.update_plots()
 
+    def _show_axis_dialog(self):
+        """Open axis settings dialog — 2-column layout (X-axis | Y-axis)"""
+        from PyQt6.QtWidgets import (QDialog, QDialogButtonBox, QFrame,
+                                     QGridLayout, QSizePolicy)
+
+        bh = self.selected_bh or "All BH"
+        defaults = {'xmin': 0, 'xmax': 60, 'ymin': 100, 'ymax': 70,
+                    'x_major': 0, 'x_minor': 0, 'y_major': 0, 'y_minor': 0,
+                    'x_major_label': 9, 'x_minor_label': 7,
+                    'y_major_label': 9, 'y_minor_label': 7,
+                    'major_alpha': 0.3, 'minor_alpha': 0.15}
+        limits = {**defaults, **self.axis_limits.get(bh, {})}
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Axis Settings")
+        dialog.setMinimumWidth(420)
+
+        outer = QVBoxLayout(dialog)
+        outer.setSpacing(10)
+
+        # ── Info ────────────────────────────────────────
+        info = QLabel(f"Applies to: <b>{bh}</b>")
+        info.setStyleSheet("color: #6E6E73;")
+        outer.addWidget(info)
+
+        # ── Main grid ───────────────────────────────────
+        grid = QGridLayout()
+        grid.setSpacing(6)
+        grid.setColumnMinimumWidth(0, 110)   # row-label column
+        grid.setColumnMinimumWidth(1, 110)   # X-axis column
+        grid.setColumnMinimumWidth(2, 110)   # Y-axis column
+
+        # Helper: build a double spinbox
+        def _dspin(value, lo=-9999, hi=9999, dec=1, suffix=""):
+            s = QDoubleSpinBox()
+            s.setRange(lo, hi)
+            s.setDecimals(dec)
+            s.setValue(value)
+            if suffix:
+                s.setSuffix(suffix)
+            s.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
+            s.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))
+            s.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            return s
+
+        # Helper: section header spanning all 3 columns
+        row = [0]
+        def _section(text):
+            if row[0] > 0:
+                sep = QFrame()
+                sep.setFrameShape(QFrame.Shape.HLine)
+                sep.setStyleSheet("color: #D1D1D6;")
+                grid.addWidget(sep, row[0], 0, 1, 3)
+                row[0] += 1
+            lbl = QLabel(text)
+            lbl.setStyleSheet("font-weight: 600; font-size: 12px; color: #1C1C1E;")
+            grid.addWidget(lbl, row[0], 0, 1, 3)
+            row[0] += 1
+
+        def _header_row():
+            """Column headers: X-axis / Y-axis"""
+            for col, text in enumerate(("X-axis", "Y-axis"), start=1):
+                h = QLabel(text)
+                h.setStyleSheet("font-weight: 600; color: #007AFF;")
+                h.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                grid.addWidget(h, row[0], col)
+            row[0] += 1
+
+        def _row(label_text, wx, wy=None):
+            lbl = QLabel(label_text)
+            lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            grid.addWidget(lbl, row[0], 0)
+            grid.addWidget(wx, row[0], 1)
+            if wy is not None:
+                grid.addWidget(wy, row[0], 2)
+            row[0] += 1
+
+        # ── Range ───────────────────────────────────────
+        _section("Range")
+        _header_row()
+        xmin_spin = _dspin(limits['xmin'])
+        xmax_spin = _dspin(limits['xmax'])
+        ymin_spin = _dspin(limits['ymin'])
+        ymax_spin = _dspin(limits['ymax'])
+        _row("Min:",    xmin_spin, ymin_spin)
+        _row("Max:",    xmax_spin, ymax_spin)
+
+        # ── Interval  (0 = Auto) ────────────────────────
+        _section("Interval  (0 = Auto)")
+        _header_row()
+        x_major_spin = _dspin(limits['x_major'], lo=0)
+        x_minor_spin = _dspin(limits['x_minor'], lo=0)
+        y_major_spin = _dspin(limits['y_major'], lo=0)
+        y_minor_spin = _dspin(limits['y_minor'], lo=0)
+        _row("Major:", x_major_spin, y_major_spin)
+        _row("Minor:", x_minor_spin, y_minor_spin)
+
+        # ── Label Size ──────────────────────────────────
+        _section("Label Size")
+        _header_row()
+        xml_spin = _dspin(limits['x_major_label'], lo=1, hi=30, dec=0)
+        xml_minor_spin = _dspin(limits['x_minor_label'], lo=1, hi=30, dec=0)
+        yml_spin = _dspin(limits['y_major_label'], lo=1, hi=30, dec=0)
+        yml_minor_spin = _dspin(limits['y_minor_label'], lo=1, hi=30, dec=0)
+        _row("Major:", xml_spin, yml_spin)
+        _row("Minor:", xml_minor_spin, yml_minor_spin)
+
+        # ── Grid Alpha ──────────────────────────────────
+        _section("Grid Transparency  (0 = invisible, 1 = solid)")
+        maj_alpha_spin = _dspin(limits['major_alpha'], lo=0.0, hi=1.0, dec=2)
+        min_alpha_spin = _dspin(limits['minor_alpha'], lo=0.0, hi=1.0, dec=2)
+        _row("Major:", maj_alpha_spin)
+        _row("Minor:", min_alpha_spin)
+
+        outer.addLayout(grid)
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        outer.addWidget(buttons)
+
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            new_limits = {
+                'xmin':           xmin_spin.value(),
+                'xmax':           xmax_spin.value(),
+                'ymin':           ymin_spin.value(),
+                'ymax':           ymax_spin.value(),
+                'x_major':        x_major_spin.value(),
+                'x_minor':        x_minor_spin.value(),
+                'y_major':        y_major_spin.value(),
+                'y_minor':        y_minor_spin.value(),
+                'x_major_label':  xml_spin.value(),
+                'x_minor_label':  xml_minor_spin.value(),
+                'y_major_label':  yml_spin.value(),
+                'y_minor_label':  yml_minor_spin.value(),
+                'major_alpha':    maj_alpha_spin.value(),
+                'minor_alpha':    min_alpha_spin.value(),
+            }
+            if bh == "All BH":
+                self.axis_limits["All BH"] = new_limits.copy()
+                for bh_name in self.bh_names:
+                    self.axis_limits[bh_name] = new_limits.copy()
+            else:
+                self.axis_limits[bh] = new_limits
+            self.update_plots()
+
+    def _show_pile_dialog(self):
+        """Open pile settings dialog with linked Top / Tip / Length fields"""
+        from PyQt6.QtWidgets import QDialog, QFormLayout, QDialogButtonBox
+
+        bh = self.selected_bh or "All BH"
+
+        # Get current pile settings
+        if bh == "All BH" and self.bh_names:
+            settings = self.bh_settings.get(self.bh_names[0], {})
+        else:
+            settings = self.bh_settings.get(bh, {})
+
+        pile_top_val  = settings.get('pile_top', 100.0)
+        pile_tip_val  = settings.get('pile_tip',  85.0)
+        pile_len_val  = pile_top_val - pile_tip_val
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Pile Settings")
+        dialog.setMinimumWidth(320)
+
+        layout = QVBoxLayout(dialog)
+
+        info = QLabel(f"Applies to: <b>{bh}</b>")
+        info.setStyleSheet("color: #6E6E73; padding-bottom: 4px;")
+        layout.addWidget(info)
+
+        form = QFormLayout()
+        form.setSpacing(10)
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+
+        def _make_spin(value, min_val=-9999):
+            s = QDoubleSpinBox()
+            s.setRange(min_val, 9999)
+            s.setDecimals(2)
+            s.setSuffix(" m")
+            s.setValue(value)
+            s.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
+            s.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))
+            s.setMinimumWidth(110)
+            return s
+
+        pile_top_spin    = _make_spin(pile_top_val)
+        pile_tip_spin    = _make_spin(pile_tip_val)
+        pile_length_spin = _make_spin(pile_len_val, min_val=0)
+
+        form.addRow("Pile Top:", pile_top_spin)
+        form.addRow("Pile Tip:", pile_tip_spin)
+        form.addRow("Pile Length:", pile_length_spin)
+
+        hint = QLabel("Changing any value updates the others automatically.")
+        hint.setStyleSheet("color: #8E8E93; font-size: 11px; padding-top: 4px;")
+        hint.setWordWrap(True)
+        form.addRow("", hint)
+        layout.addLayout(form)
+
+        # Linked-field logic (guard prevents recursion)
+        _updating = [False]
+
+        def on_top_changed(val):
+            if _updating[0]: return
+            _updating[0] = True
+            pile_length_spin.setValue(val - pile_tip_spin.value())
+            _updating[0] = False
+
+        def on_tip_changed(val):
+            if _updating[0]: return
+            _updating[0] = True
+            pile_length_spin.setValue(pile_top_spin.value() - val)
+            _updating[0] = False
+
+        def on_length_changed(val):
+            if _updating[0]: return
+            _updating[0] = True
+            pile_tip_spin.setValue(pile_top_spin.value() - val)
+            _updating[0] = False
+
+        pile_top_spin.valueChanged.connect(on_top_changed)
+        pile_tip_spin.valueChanged.connect(on_tip_changed)
+        pile_length_spin.valueChanged.connect(on_length_changed)
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            pile_top = pile_top_spin.value()
+            pile_tip = pile_tip_spin.value()
+
+            if bh == "All BH":
+                for bh_name in self.bh_names:
+                    if bh_name not in self.bh_settings:
+                        self.bh_settings[bh_name] = {}
+                    self.bh_settings[bh_name]['pile_top'] = pile_top
+                    self.bh_settings[bh_name]['pile_tip'] = pile_tip
+            else:
+                if bh not in self.bh_settings:
+                    self.bh_settings[bh] = {}
+                self.bh_settings[bh]['pile_top'] = pile_top
+                self.bh_settings[bh]['pile_tip'] = pile_tip
+
+            self.update_plots()
+
     def on_bh_selected(self, bh_name):
         """Handle BH selection change in combo box"""
         if not bh_name or bh_name not in self.axis_limits:
             return
-
         self.selected_bh = bh_name
-
-        # Update spin boxes with selected BH's axis limits
-        limits = self.axis_limits[bh_name]
-
-        # Temporarily disconnect to avoid triggering updates
-        self.xmin_spin.valueChanged.disconnect(self.update_axis_limits)
-        self.xmax_spin.valueChanged.disconnect(self.update_axis_limits)
-        self.ymin_spin.valueChanged.disconnect(self.update_axis_limits)
-        self.ymax_spin.valueChanged.disconnect(self.update_axis_limits)
-
-        self.xmin_spin.setValue(limits['xmin'])
-        self.xmax_spin.setValue(limits['xmax'])
-        self.ymin_spin.setValue(limits['ymin'])
-        self.ymax_spin.setValue(limits['ymax'])
-
-        # Reconnect
-        self.xmin_spin.valueChanged.connect(self.update_axis_limits)
-        self.xmax_spin.valueChanged.connect(self.update_axis_limits)
-        self.ymin_spin.valueChanged.connect(self.update_axis_limits)
-        self.ymax_spin.valueChanged.connect(self.update_axis_limits)
-
-        # Load pile settings for selected BH (or first BH if "All BH")
-        if bh_name == "All BH" and self.bh_names:
-            # Use first BH settings for display when "All BH" is selected
-            bh_settings = self.bh_settings.get(self.bh_names[0], {})
-        else:
-            bh_settings = self.bh_settings.get(bh_name, {})
-
-        pile_top = bh_settings.get('pile_top', 100.0)
-        pile_tip = bh_settings.get('pile_tip', 85.0)
-
-        # Temporarily disconnect to avoid triggering updates
-        self.pile_top_spin.valueChanged.disconnect(self.on_pile_settings_changed)
-        self.pile_tip_spin.valueChanged.disconnect(self.on_pile_settings_changed)
-
-        self.pile_top_spin.setValue(pile_top)
-        self.pile_tip_spin.setValue(pile_tip)
-
-        # Reconnect
-        self.pile_top_spin.valueChanged.connect(self.on_pile_settings_changed)
-        self.pile_tip_spin.valueChanged.connect(self.on_pile_settings_changed)
-
-    def on_pile_settings_changed(self):
-        """Handle pile top/tip changes and save to current BH settings"""
-        pile_top = self.pile_top_spin.value()
-        pile_tip = self.pile_tip_spin.value()
-
-        # If "All BH" is selected, apply to all boreholes
-        if self.selected_bh == "All BH":
-            for bh_name in self.bh_names:
-                if bh_name not in self.bh_settings:
-                    self.bh_settings[bh_name] = {}
-                self.bh_settings[bh_name]['pile_top'] = pile_top
-                self.bh_settings[bh_name]['pile_tip'] = pile_tip
-        elif self.selected_bh:
-            # Save to bh_settings for current BH
-            if self.selected_bh not in self.bh_settings:
-                self.bh_settings[self.selected_bh] = {}
-            self.bh_settings[self.selected_bh]['pile_top'] = pile_top
-            self.bh_settings[self.selected_bh]['pile_tip'] = pile_tip
-        else:
-            # No BH selected, skip
-            return
-
-        # Update plots
-        self.update_plots()
-
-    def update_axis_limits(self):
-        """Update axis limits for selected BH or all BHs"""
-        if not self.selected_bh:
-            return
-
-        new_limits = {
-            'xmin': self.xmin_spin.value(),
-            'xmax': self.xmax_spin.value(),
-            'ymin': self.ymin_spin.value(),
-            'ymax': self.ymax_spin.value()
-        }
-
-        if self.selected_bh == "All BH":
-            # Update limits for all boreholes
-            self.axis_limits["All BH"] = new_limits
-            for bh in self.bh_names:
-                self.axis_limits[bh] = new_limits.copy()
-        else:
-            # Update limits for specific borehole
-            self.axis_limits[self.selected_bh] = new_limits
-
-        self.update_plots()
 
     def update_label_size(self, value):
         """Update label size"""
@@ -1060,8 +1173,8 @@ class Module1SPTPlot(QWidget):
         ax.set_xlim(limits['xmin'], limits['xmax'])
         ax.set_ylim(limits['ymax'], limits['ymin'])
 
-        # Grid
-        ax.grid(True, alpha=0.3, color='#CCCCCC')
+        # Apply tick intervals
+        self._apply_tick_locators(ax, limits)
 
         # Add legend if pile is drawn
         if pile_top > pile_tip:
@@ -1149,10 +1262,46 @@ class Module1SPTPlot(QWidget):
         ax.set_title(title_text, fontsize=13, fontweight='bold', pad=15, color='black')
         ax.set_xlim(limits['xmin'], limits['xmax'])
         ax.set_ylim(limits['ymax'], limits['ymin'])
-        ax.grid(True, alpha=0.3, color='#CCCCCC')
+        self._apply_tick_locators(ax, limits)
 
         if pile_top > pile_tip:
             ax.legend(loc='lower right', framealpha=0.9, fontsize=8)
+
+    def _apply_tick_locators(self, ax, limits):
+        """Apply tick locators, label sizes, and grid alpha from axis_limits settings"""
+        from matplotlib.ticker import MultipleLocator
+
+        x_major       = limits.get('x_major', 0)
+        x_minor       = limits.get('x_minor', 0)
+        y_major       = limits.get('y_major', 0)
+        y_minor       = limits.get('y_minor', 0)
+        x_major_label = limits.get('x_major_label', 9)
+        x_minor_label = limits.get('x_minor_label', 7)
+        y_major_label = limits.get('y_major_label', 9)
+        y_minor_label = limits.get('y_minor_label', 7)
+        major_alpha   = limits.get('major_alpha', 0.3)
+        minor_alpha   = limits.get('minor_alpha', 0.15)
+
+        # ── Tick intervals ──────────────────────────────
+        if x_major > 0:
+            ax.xaxis.set_major_locator(MultipleLocator(x_major))
+        if x_minor > 0:
+            ax.xaxis.set_minor_locator(MultipleLocator(x_minor))
+        if y_major > 0:
+            ax.yaxis.set_major_locator(MultipleLocator(y_major))
+        if y_minor > 0:
+            ax.yaxis.set_minor_locator(MultipleLocator(y_minor))
+
+        # ── Tick label sizes ────────────────────────────
+        ax.tick_params(axis='x', which='major', labelsize=x_major_label)
+        ax.tick_params(axis='x', which='minor', labelsize=x_minor_label)
+        ax.tick_params(axis='y', which='major', labelsize=y_major_label)
+        ax.tick_params(axis='y', which='minor', labelsize=y_minor_label)
+
+        # ── Grid lines ──────────────────────────────────
+        ax.grid(True, which='major', alpha=major_alpha, color='#CCCCCC', linestyle='-')
+        if x_minor > 0 or y_minor > 0:
+            ax.grid(True, which='minor', alpha=minor_alpha, color='#CCCCCC', linestyle=':')
 
     def _apply_plot_style(self):
         """Apply clean white background theme with dark text/borders"""
@@ -1182,7 +1331,11 @@ class Module1SPTPlot(QWidget):
 
         # Initialize empty data
         self.borehole_data[new_bh] = {}
-        self.axis_limits[new_bh] = {'xmin': 0, 'xmax': 100, 'ymin': 0, 'ymax': 30}
+        self.axis_limits[new_bh] = {'xmin': 0, 'xmax': 60, 'ymin': 100, 'ymax': 70,
+                                     'x_major': 0, 'x_minor': 0, 'y_major': 0, 'y_minor': 0,
+                                     'x_major_label': 9, 'x_minor_label': 7,
+                                     'y_major_label': 9, 'y_minor_label': 7,
+                                     'major_alpha': 0.3, 'minor_alpha': 0.15}
         self.bh_settings[new_bh] = {
             'surface_elev': 100.0,
             'water_level': 0.0,
@@ -1386,6 +1539,20 @@ class Module1SPTPlot(QWidget):
 
             self.bh_settings = data.get('bh_settings', {})
             self.axis_limits = data.get('axis_limits', {})
+
+            # Backward compat: ensure all tick/style keys exist for old save files
+            for lim in self.axis_limits.values():
+                lim.setdefault('x_major', 0)
+                lim.setdefault('x_minor', 0)
+                lim.setdefault('y_major', 0)
+                lim.setdefault('y_minor', 0)
+                lim.setdefault('x_major_label', 9)
+                lim.setdefault('x_minor_label', 7)
+                lim.setdefault('y_major_label', 9)
+                lim.setdefault('y_minor_label', 7)
+                lim.setdefault('major_alpha', 0.3)
+                lim.setdefault('minor_alpha', 0.15)
+
             self.label_size = data.get('label_size', 8)
 
             # Load vline settings
