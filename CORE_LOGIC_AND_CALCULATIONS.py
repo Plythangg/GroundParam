@@ -623,29 +623,29 @@ def calculate_rint(su, soil_type, method, surface_type):
     สำหรับดินเหนียว (Clay):
         ขึ้นอยู่กับวิธีการก่อสร้างและค่า Su
 
-        Method = "ตอก/กด":
-            Su < 2.5:        Rint = 1.00 (adhesion เต็ม)
-            2.5 ≤ Su < 7.5:  Rint = 1.00 - 0.5×((Su-2.5)/5)  (ลดลงแบบเส้นตรง)
+        Method = "Driven":
+            Su < 2.5:        Rint = 1.00 (full adhesion)
+            2.5 ≤ Su < 7.5:  Rint = 1.00 - 0.5×((Su-2.5)/5)  (linear interpolation)
             Su ≥ 7.5:        Rint = 0.50
 
-        Method = "เจาะ":
-            Rint = 0.45 (ทุกกรณี)
+        Method = "Bored":
+            Rint = 0.45 (all cases)
 
     สำหรับดินทราย (Sand):
         ขึ้นอยู่กับประเภทผิวสัมผัส
 
-        - คอนกรีตผิวหยาบ: Rint = 1.0 (เสียดทานเต็ม)
-        - คอนกรีตผิวเรียบ: Rint = 0.8
-        - เหล็กผิวหยาบ:    Rint = 0.7
-        - เหล็กผิวเรียบ:    Rint = 0.5
-        - ไม้:            Rint = 0.8
+        - Rough Concrete: Rint = 1.0
+        - Smooth Concrete: Rint = 0.8
+        - Rough Steel:    Rint = 0.7
+        - Smooth Steel:   Rint = 0.5
+        - Timber:         Rint = 0.8
 
     Args:
         su (float): Undrained shear strength (kN/m²)
-        soil_type (str): "Clay" หรือ "Sand"
-        method (str): "ตอก/กด" หรือ "เจาะ"
-        surface_type (str): "คอนกรีตผิวหยาบ", "คอนกรีตผิวเรียบ", "เหล็กผิวหยาบ",
-                           "เหล็กผิวเรียบ", "ไม้"
+        soil_type (str): "Clay" or "Sand"
+        method (str): "Driven" or "Bored"
+        surface_type (str): "Rough Concrete", "Smooth Concrete", "Rough Steel",
+                           "Smooth Steel", "Timber"
 
     Returns:
         float: Rint (ไม่มีหน่วย, 0-1)
@@ -666,25 +666,24 @@ def calculate_rint(su, soil_type, method, surface_type):
         - Tomlinson (1957) - สำหรับ adhesion factor
     """
     if soil_type == "Clay":
-        if method == "ตอก/กด":
+        if method == "Driven":
             if su is None or su == 0:
                 return 0
             if su < 2.5:
                 return 1
             elif su < 7.5:
-                # Linear interpolation: 1.0 ที่ Su=2.5 ลงมาเป็น 0.5 ที่ Su=7.5
                 return 1 - (0.5 * ((su - 2.5) / 5))
             else:
                 return 0.5
-        else:  # เจาะ
+        else:  # Bored
             return 0.45
     else:  # Sand
         surface_map = {
-            "คอนกรีตผิวหยาบ": 1.0,
-            "คอนกรีตผิวเรียบ": 0.8,
-            "เหล็กผิวหยาบ": 0.7,
-            "เหล็กผิวเรียบ": 0.5,
-            "ไม้": 0.8
+            "Rough Concrete": 1.0,
+            "Smooth Concrete": 0.8,
+            "Rough Steel": 0.7,
+            "Smooth Steel": 0.5,
+            "Timber": 0.8
         }
         return surface_map.get(surface_type, 0)
 
@@ -723,9 +722,9 @@ def calculate_all_parameters(borehole_data, settings):
             {
                 'structure_type': str,          # "Sheet Pile", "Earth Retaining Structure",
                                                # "Diaphragm Wall"
-                'method': str,                  # "ตอก/กด", "เจาะ"
-                'surface_type': str,            # "คอนกรีตผิวหยาบ", "คอนกรีตผิวเรียบ",
-                                               # "เหล็กผิวหยาบ", "เหล็กผิวเรียบ", "ไม้"
+                'method': str,                  # "Driven", "Bored"
+                'surface_type': str,            # "Rough Concrete", "Smooth Concrete",
+                                               # "Rough Steel", "Smooth Steel", "Timber"
                 'correction_method': str        # "Liao and Whitman (1986)", "Terzaghi (1984)"
             }
 
@@ -794,8 +793,8 @@ def calculate_all_parameters(borehole_data, settings):
         ... }
         >>> settings = {
         ...     'structure_type': 'Earth Retaining Structure',
-        ...     'method': 'ตอก/กด',
-        ...     'surface_type': 'คอนกรีตผิวเรียบ',
+        ...     'method': 'Driven',
+        ...     'surface_type': 'Smooth Concrete',
         ...     'correction_method': 'Liao and Whitman (1986)'
         ... }
         >>> results = calculate_all_parameters(borehole_data, settings)
@@ -902,8 +901,8 @@ if __name__ == "__main__":
     # ตัวอย่างการตั้งค่า
     sample_settings = {
         'structure_type': 'Earth Retaining Structure',
-        'method': 'ตอก/กด',
-        'surface_type': 'คอนกรีตผิวเรียบ',
+        'method': 'Driven',
+        'surface_type': 'Smooth Concrete',
         'correction_method': 'Liao and Whitman (1986)'
     }
 

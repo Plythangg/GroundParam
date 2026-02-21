@@ -33,13 +33,19 @@ class CustomTableWidget(QTableWidget):
     """Custom table widget with Enter key navigation and paste support"""
 
     def keyPressEvent(self, event: QKeyEvent):
-        """Handle key press events - Enter moves down, Ctrl+V pastes"""
+        """Handle key press events - Enter moves down, Ctrl+A selects all, Ctrl+C copies, Ctrl+V pastes"""
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             # Move to next row (down) when Enter is pressed
             current = self.currentRow()
             current_col = self.currentColumn()
             if current < self.rowCount() - 1:
                 self.setCurrentCell(current + 1, current_col)
+            event.accept()
+        elif event.matches(QKeySequence.StandardKey.SelectAll):
+            self.selectAll()
+            event.accept()
+        elif event.matches(QKeySequence.StandardKey.Copy):
+            self._copy_to_clipboard()
             event.accept()
         elif event.matches(QKeySequence.StandardKey.Paste):
             # Handle paste from clipboard
@@ -49,6 +55,39 @@ class CustomTableWidget(QTableWidget):
             # Default behavior for other keys
             super().keyPressEvent(event)
 
+    def _copy_to_clipboard(self):
+        """Copy selected cells to clipboard in Excel-compatible tab-separated format"""
+        selected = self.selectedRanges()
+        if not selected:
+            return
+
+        # Find bounding box of all selected ranges
+        min_row = min(r.topRow() for r in selected)
+        max_row = max(r.bottomRow() for r in selected)
+        min_col = min(r.leftColumn() for r in selected)
+        max_col = max(r.rightColumn() for r in selected)
+
+        # Build set of selected cells for quick lookup
+        selected_cells = set()
+        for r in selected:
+            for row in range(r.topRow(), r.bottomRow() + 1):
+                for col in range(r.leftColumn(), r.rightColumn() + 1):
+                    selected_cells.add((row, col))
+
+        # Build tab-separated text (Excel format)
+        lines = []
+        for row in range(min_row, max_row + 1):
+            row_data = []
+            for col in range(min_col, max_col + 1):
+                if (row, col) in selected_cells:
+                    item = self.item(row, col)
+                    row_data.append(item.text() if item else '')
+                else:
+                    row_data.append('')
+            lines.append('\t'.join(row_data))
+
+        QApplication.clipboard().setText('\n'.join(lines))
+
     def _paste_from_clipboard(self):
         """Paste data from clipboard (Excel format)"""
         clipboard = QApplication.clipboard()
@@ -57,40 +96,59 @@ class CustomTableWidget(QTableWidget):
         if not text:
             return
 
-        # Get current selection
-        current_row = self.currentRow()
-        current_col = self.currentColumn()
+        # Always paste from top-left of current selection (mirrors Excel behaviour)
+        selected = self.selectedRanges()
+        if selected:
+            current_row = min(r.topRow() for r in selected)
+            current_col = min(r.leftColumn() for r in selected)
+        else:
+            current_row = self.currentRow()
+            current_col = self.currentColumn()
 
         if current_row < 0 or current_col < 0:
             return
 
-        # Parse clipboard data (tab-separated for columns, newline for rows)
-        rows = text.strip().split('\n')
+        # Block signals during paste so cellChanged fires only once per cell
+        # (avoids calling update_plots() for every single cell)
+        self.blockSignals(True)
+        changed_cells = []
 
-        for row_idx, row_data in enumerate(rows):
-            target_row = current_row + row_idx
-            if target_row >= self.rowCount():
-                break
+        try:
+            # Parse clipboard data (tab-separated for columns, newline for rows)
+            rows = text.strip().split('\n')
 
-            # Split by tab for columns
-            cells = row_data.split('\t')
-
-            for col_idx, cell_value in enumerate(cells):
-                target_col = current_col + col_idx
-                if target_col >= self.columnCount():
+            for row_idx, row_data in enumerate(rows):
+                target_row = current_row + row_idx
+                if target_row >= self.rowCount():
                     break
 
-                # Check if cell is editable
-                item = self.item(target_row, target_col)
-                if item and not (item.flags() & Qt.ItemFlag.ItemIsEditable):
-                    continue
+                # Split by tab for columns
+                cells = row_data.split('\t')
 
-                # Set cell value (handle empty cells)
-                if not item:
-                    item = QTableWidgetItem(cell_value.strip())
-                    self.setItem(target_row, target_col, item)
-                else:
-                    item.setText(cell_value.strip())
+                for col_idx, cell_value in enumerate(cells):
+                    target_col = current_col + col_idx
+                    if target_col >= self.columnCount():
+                        break
+
+                    # Check if cell is editable
+                    item = self.item(target_row, target_col)
+                    if item and not (item.flags() & Qt.ItemFlag.ItemIsEditable):
+                        continue
+
+                    # Set cell value
+                    if not item:
+                        item = QTableWidgetItem(cell_value.strip())
+                        self.setItem(target_row, target_col, item)
+                    else:
+                        item.setText(cell_value.strip())
+                    changed_cells.append((target_row, target_col))
+
+        finally:
+            self.blockSignals(False)
+
+        # Fire cellChanged once per changed cell so the parent model updates
+        for r, c in changed_cells:
+            self.cellChanged.emit(r, c)
 
 
 class Module1SPTPlot(QWidget):
@@ -190,9 +248,9 @@ class Module1SPTPlot(QWidget):
         layout.addWidget(self.bh_selector)
 
         # Axis Settings icon button
-        btn_axis = QPushButton("⚙ Axis")
+        btn_axis = QPushButton("Axis Setting")
         btn_axis.setFont(QFont("SF Pro Display", 11))
-        btn_axis.setMaximumWidth(80)
+        btn_axis.setMaximumWidth(100)
         btn_axis.setToolTip("Open axis settings (Xmin, Xmax, Ytop, Ybottom)")
         btn_axis.clicked.connect(self._show_axis_dialog)
         layout.addWidget(btn_axis)
@@ -218,9 +276,9 @@ class Module1SPTPlot(QWidget):
         layout.addWidget(separator_pile)
 
         # Pile Settings icon button
-        btn_pile = QPushButton("📐 Pile")
+        btn_pile = QPushButton("Pile Setting")
         btn_pile.setFont(QFont("SF Pro Display", 11))
-        btn_pile.setMaximumWidth(85)
+        btn_pile.setMaximumWidth(100)
         btn_pile.setToolTip("Open pile settings (Pile Top, Pile Tip, Pile Length)")
         btn_pile.clicked.connect(self._show_pile_dialog)
         layout.addWidget(btn_pile)
@@ -358,7 +416,7 @@ class Module1SPTPlot(QWidget):
                 color: black;
             }
             QTableWidget::item:selected {
-                background-color: transparent;
+                background-color: rgba(0, 122, 255, 0.10);
                 color: black;
             }
             QTableWidget::item:focus {

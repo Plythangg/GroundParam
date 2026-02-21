@@ -26,18 +26,64 @@ Calculated Parameters:
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
     QTableWidget, QTableWidgetItem, QHeaderView, QComboBox,
-    QFileDialog, QMessageBox, QDoubleSpinBox, QGroupBox, QFormLayout
+    QFileDialog, QMessageBox, QDoubleSpinBox, QGroupBox, QFormLayout,
+    QApplication
 )
+from ui.Cal_Ref_Guide import CalculationReferenceDialog
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QFont, QColor
+from PyQt6.QtGui import QFont, QColor, QKeyEvent, QKeySequence
 import csv
 import sys
 import os
 
-# Add scripts directory to path to import CORE_LOGIC
-scripts_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts')
-sys.path.insert(0, scripts_path)
+# Add root directory to path to import CORE_LOGIC
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, root_path)
 import CORE_LOGIC_AND_CALCULATIONS as calc
+
+
+class ReadOnlyTableWidget(QTableWidget):
+    """Read-only table widget with Ctrl+A (select all) and Ctrl+C (copy) support"""
+
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.matches(QKeySequence.StandardKey.SelectAll):
+            self.selectAll()
+            event.accept()
+        elif event.matches(QKeySequence.StandardKey.Copy):
+            self._copy_to_clipboard()
+            event.accept()
+        else:
+            super().keyPressEvent(event)
+
+    def _copy_to_clipboard(self):
+        """Copy selected cells to clipboard in Excel-compatible tab-separated format"""
+        selected = self.selectedRanges()
+        if not selected:
+            return
+
+        min_row = min(r.topRow() for r in selected)
+        max_row = max(r.bottomRow() for r in selected)
+        min_col = min(r.leftColumn() for r in selected)
+        max_col = max(r.rightColumn() for r in selected)
+
+        selected_cells = set()
+        for r in selected:
+            for row in range(r.topRow(), r.bottomRow() + 1):
+                for col in range(r.leftColumn(), r.rightColumn() + 1):
+                    selected_cells.add((row, col))
+
+        lines = []
+        for row in range(min_row, max_row + 1):
+            row_data = []
+            for col in range(min_col, max_col + 1):
+                if (row, col) in selected_cells:
+                    item = self.item(row, col)
+                    row_data.append(item.text() if item else '')
+                else:
+                    row_data.append('')
+            lines.append('\t'.join(row_data))
+
+        QApplication.clipboard().setText('\n'.join(lines))
 
 
 def get_consistency(soil_type, n_value=None, su=None):
@@ -61,7 +107,7 @@ def get_consistency(soil_type, n_value=None, su=None):
         elif su < 25:
             return "Soft Clay"
         elif su < 50:
-            return "Hard Clay"
+            return "Medium Clay"
         elif su < 100:
             return "Stiff Clay"
         elif su < 200:
@@ -106,8 +152,8 @@ class Module3Parameters(QWidget):
         # Settings for calculations (Ground elevation and water depth now from Module 1)
         self.settings = {
             'structure_type': 'Earth Retaining Structure',
-            'method': 'ตอก/กด',
-            'surface_type': 'คอนกรีตผิวเรียบ',
+            'method': 'Driven',
+            'surface_type': 'Smooth Concrete',
             'correction_method': 'Liao and Whitman (1986)'
         }
 
@@ -179,8 +225,8 @@ class Module3Parameters(QWidget):
         layout.addWidget(QLabel("Method:"))
         self.method_combo = QComboBox()
         self.method_combo.setFont(QFont("SF Pro Display", 14))
-        self.method_combo.setMaximumWidth(150)
-        self.method_combo.addItems(['ตอก/กด', 'เจาะ'])
+        self.method_combo.setMaximumWidth(120)
+        self.method_combo.addItems(['Driven', 'Bored'])
         self.method_combo.setCurrentText(self.settings['method'])
         self.method_combo.currentTextChanged.connect(self.on_settings_changed)
         layout.addWidget(self.method_combo)
@@ -188,13 +234,13 @@ class Module3Parameters(QWidget):
         layout.addWidget(QLabel("Surface:"))
         self.surface_combo = QComboBox()
         self.surface_combo.setFont(QFont("SF Pro Display", 14))
-        self.surface_combo.setMaximumWidth(150)
+        self.surface_combo.setMaximumWidth(170)
         self.surface_combo.addItems([
-            'คอนกรีตผิวหยาบ',
-            'คอนกรีตผิวเรียบ',
-            'เหล็กผิวหยาบ',
-            'เหล็กผิวเรียบ',
-            'ไม้'
+            'Rough Concrete',
+            'Smooth Concrete',
+            'Rough Steel',
+            'Smooth Steel',
+            'Timber'
         ])
         self.surface_combo.setCurrentText(self.settings['surface_type'])
         self.surface_combo.currentTextChanged.connect(self.on_settings_changed)
@@ -211,6 +257,34 @@ class Module3Parameters(QWidget):
         self.correction_combo.setCurrentText(self.settings['correction_method'])
         self.correction_combo.currentTextChanged.connect(self.on_settings_changed)
         layout.addWidget(self.correction_combo)
+
+        # Small info button — opens calculation reference dialog
+        btn_ref = QPushButton("i")
+        btn_ref.setFixedSize(22, 22)
+        btn_ref.setFont(QFont("SF Pro Display", 11, QFont.Weight.Bold))
+        btn_ref.setToolTip(
+            "Calculation Reference Guide\n"
+            "Formula · Scientist reference · Worked example for every column"
+        )
+        btn_ref.setStyleSheet("""
+            QPushButton {
+                border: 1.5px solid #007AFF;
+                border-radius: 11px;
+                color: #007AFF;
+                background: transparent;
+                padding: 0;
+            }
+            QPushButton:hover {
+                background: #007AFF;
+                color: white;
+            }
+            QPushButton:pressed {
+                background: #0051D5;
+                color: white;
+            }
+        """)
+        btn_ref.clicked.connect(self._show_calculation_reference)
+        layout.addWidget(btn_ref)
 
         layout.addStretch()
 
@@ -262,7 +336,7 @@ class Module3Parameters(QWidget):
 
         # Construction method
         self.method_combo = QComboBox()
-        self.method_combo.addItems(['ตอก/กด', 'เจาะ'])
+        self.method_combo.addItems(['Driven', 'Bored'])
         self.method_combo.setCurrentText(self.settings['method'])
         self.method_combo.currentTextChanged.connect(self.on_settings_changed)
         form.addRow("Construction Method:", self.method_combo)
@@ -270,11 +344,11 @@ class Module3Parameters(QWidget):
         # Surface type
         self.surface_combo = QComboBox()
         self.surface_combo.addItems([
-            'คอนกรีตผิวหยาบ',
-            'คอนกรีตผิวเรียบ',
-            'เหล็กผิวหยาบ',
-            'เหล็กผิวเรียบ',
-            'ไม้'
+            'Rough Concrete',
+            'Smooth Concrete',
+            'Rough Steel',
+            'Smooth Steel',
+            'Timber'
         ])
         self.surface_combo.setCurrentText(self.settings['surface_type'])
         self.surface_combo.currentTextChanged.connect(self.on_settings_changed)
@@ -314,20 +388,19 @@ class Module3Parameters(QWidget):
 
     def _create_table_widget(self):
         """Create table widget for displaying results"""
-        table = QTableWidget()
+        table = ReadOnlyTableWidget()
         table.setColumnCount(0)
         table.setRowCount(0)
         table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)  # Read-only
         table.setAlternatingRowColors(True)
 
-        # Remove selection highlight (no blue cover on selected cells)
         table.setStyleSheet("""
             QTableWidget::item:hover {
                 background-color: rgba(0, 122, 255, 0.06);
                 color: black;
             }
             QTableWidget::item:selected {
-                background-color: transparent;
+                background-color: rgba(0, 122, 255, 0.10);
                 color: black;
             }
             QTableWidget::item:focus {
@@ -348,6 +421,11 @@ class Module3Parameters(QWidget):
         self.settings['method'] = self.method_combo.currentText()
         self.settings['surface_type'] = self.surface_combo.currentText()
         self.settings['correction_method'] = self.correction_combo.currentText()
+
+    def _show_calculation_reference(self):
+        """Open the Calculation Reference Guide dialog"""
+        dlg = CalculationReferenceDialog(self)
+        dlg.exec()
 
     def on_bh_selected(self, bh_name):
         """Handle BH selection change"""
@@ -778,7 +856,6 @@ class Module3Parameters(QWidget):
             ('K0', 'k0'),
             ('Rint', 'rint')
         ]
-
 
         # Setup table
         self.table_widget.setRowCount(total_rows)
@@ -1321,11 +1398,11 @@ class Module3Parameters(QWidget):
         if structure_idx >= 0:
             self.structure_combo.setCurrentIndex(structure_idx)
 
-        method_idx = self.method_combo.findText(self.settings.get('method', 'ตอก/กด'))
+        method_idx = self.method_combo.findText(self.settings.get('method', 'Driven'))
         if method_idx >= 0:
             self.method_combo.setCurrentIndex(method_idx)
 
-        surface_idx = self.surface_combo.findText(self.settings.get('surface_type', 'คอนกรีตผิวเรียบ'))
+        surface_idx = self.surface_combo.findText(self.settings.get('surface_type', 'Smooth Concrete'))
         if surface_idx >= 0:
             self.surface_combo.setCurrentIndex(surface_idx)
 
